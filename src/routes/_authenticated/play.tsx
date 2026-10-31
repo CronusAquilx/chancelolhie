@@ -11,8 +11,19 @@ export const Route = createFileRoute("/_authenticated/play")({
   component: Play,
 });
 
+// Sites served by a dedicated relay on Astra's own domain (much faster than the in-page proxy
+// for huge games, and cross-origin isolated because they open as the whole tab).
+function directRelay(url: string): string | null {
+  try {
+    const h = new URL(url).hostname;
+    if (h === "fiveplay.lol" || h === "www.fiveplay.lol" || h === "gta.deloskiyt.pl") return "/api/public/fp/";
+  } catch { /* ignore */ }
+  return null;
+}
+
 function Play() {
   const { url, name } = Route.useSearch();
+  const direct = directRelay(url);
   const prefs = usePrefs();
   const ref = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +50,7 @@ function Play() {
 
   useEffect(() => {
     if (name) document.title = `${name} — Astra`;
+    if (started && direct) { window.location.href = direct; return; }
     const iframe = ref.current;
     if (!started || !iframe || !url) return;
     const keepInside = () => {

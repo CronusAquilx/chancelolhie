@@ -37,6 +37,7 @@ import { Route as ScramjetPSplatRouteImport } from './routes/scramjet.p.$'
 import { Route as AuthenticatedMoviesFreeVideoIdRouteImport } from './routes/_authenticated/movies.free.$videoId'
 import { Route as AuthenticatedMoviesPersonIdRouteImport } from './routes/_authenticated/movies.person.$id'
 import { Route as AuthenticatedMoviesProviderSlugRouteImport } from './routes/_authenticated/movies.provider.$slug'
+import { Route as ApiPublicFpSplatRouteImport } from './routes/api/public/fp.$'
 import { Route as ApiPublicGamesSplatRouteImport } from './routes/api/public/games.$'
 import { Route as AuthenticatedMoviesTitleTypeIdRouteImport } from './routes/_authenticated/movies.title.$type.$id'
 import { Route as AuthenticatedMoviesWatchTypeIdRouteImport } from './routes/_authenticated/movies.watch.$type.$id'
@@ -185,6 +186,11 @@ const AuthenticatedMoviesProviderSlugRoute =
     path: '/movies/provider/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicFpSplatRoute = ApiPublicFpSplatRouteImport.update({
+  id: '/api/public/fp/$',
+  path: '/api/public/fp/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGamesSplatRoute = ApiPublicGamesSplatRouteImport.update({
   id: '/api/public/games/$',
   path: '/api/public/games/$',
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
   '/movies/provider/$slug': typeof AuthenticatedMoviesProviderSlugRoute
+  '/api/public/fp/$': typeof ApiPublicFpSplatRoute
   '/api/public/games/$': typeof ApiPublicGamesSplatRoute
   '/movies/title/$type/$id': typeof AuthenticatedMoviesTitleTypeIdRoute
   '/movies/watch/$type/$id': typeof AuthenticatedMoviesWatchTypeIdRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
   '/movies/provider/$slug': typeof AuthenticatedMoviesProviderSlugRoute
+  '/api/public/fp/$': typeof ApiPublicFpSplatRoute
   '/api/public/games/$': typeof ApiPublicGamesSplatRoute
   '/movies/title/$type/$id': typeof AuthenticatedMoviesTitleTypeIdRoute
   '/movies/watch/$type/$id': typeof AuthenticatedMoviesWatchTypeIdRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/_authenticated/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
   '/_authenticated/movies/provider/$slug': typeof AuthenticatedMoviesProviderSlugRoute
+  '/api/public/fp/$': typeof ApiPublicFpSplatRoute
   '/api/public/games/$': typeof ApiPublicGamesSplatRoute
   '/_authenticated/movies/title/$type/$id': typeof AuthenticatedMoviesTitleTypeIdRoute
   '/_authenticated/movies/watch/$type/$id': typeof AuthenticatedMoviesWatchTypeIdRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/movies/free/$videoId'
     | '/movies/person/$id'
     | '/movies/provider/$slug'
+    | '/api/public/fp/$'
     | '/api/public/games/$'
     | '/movies/title/$type/$id'
     | '/movies/watch/$type/$id'
@@ -363,6 +373,7 @@ export interface FileRouteTypes {
     | '/movies/free/$videoId'
     | '/movies/person/$id'
     | '/movies/provider/$slug'
+    | '/api/public/fp/$'
     | '/api/public/games/$'
     | '/movies/title/$type/$id'
     | '/movies/watch/$type/$id'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/movies/free/$videoId'
     | '/_authenticated/movies/person/$id'
     | '/_authenticated/movies/provider/$slug'
+    | '/api/public/fp/$'
     | '/api/public/games/$'
     | '/_authenticated/movies/title/$type/$id'
     | '/_authenticated/movies/watch/$type/$id'
@@ -415,6 +427,7 @@ export interface RootRouteChildren {
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiVoiceReplyRoute: typeof ApiVoiceReplyRoute
   ScramjetPSplatRoute: typeof ScramjetPSplatRoute
+  ApiPublicFpSplatRoute: typeof ApiPublicFpSplatRoute
   ApiPublicGamesSplatRoute: typeof ApiPublicGamesSplatRoute
 }
 
@@ -616,6 +629,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoviesProviderSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/fp/$': {
+      id: '/api/public/fp/$'
+      path: '/api/public/fp/$'
+      fullPath: '/api/public/fp/$'
+      preLoaderRoute: typeof ApiPublicFpSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/games/$': {
       id: '/api/public/games/$'
       path: '/api/public/games/$'
@@ -697,6 +717,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiVoiceReplyRoute: ApiVoiceReplyRoute,
   ScramjetPSplatRoute: ScramjetPSplatRoute,
+  ApiPublicFpSplatRoute: ApiPublicFpSplatRoute,
   ApiPublicGamesSplatRoute: ApiPublicGamesSplatRoute,
 }
 export const routeTree = rootRouteImport
