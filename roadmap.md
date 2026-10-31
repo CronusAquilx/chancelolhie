@@ -1,6 +1,8 @@
 # Birchbeat import roadmap
 
 ## Console Mode
+- [x] Fix console media/installed-game document reloads and add bundled original game thumbnails; launch and visit-state regression tests pass.
+- [ ] Verify these updated launches with a real account — automatic sign-in could not match the requesting user; needs preview sign-in.
 - [x] Fix the diagnosed proxy startup failure by stripping browser transports from server execution; compilation and regression tests pass.
 - [ ] Verify the fix on the published runtime — waiting for Publish changes; the published site still runs the previous snapshot.
 - [x] Ask layout, device and content every new visit; always show matching login/account confirmation. Signed-out and restored-session flows verified.

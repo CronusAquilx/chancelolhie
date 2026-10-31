@@ -59,17 +59,17 @@ export function toggleWishlist(id: string) {
   persist(); emit();
 }
 
-export function playGame(g: ConsoleGame) {
+export function playGame(g: ConsoleGame, navigate: (path: string) => void) {
   state = { ...state, lastPlayed: g.id };
   persist(); emit();
   const path = launchPath(g);
   if (g.kind === "cloud") window.open(path, "_blank", "noopener");
-  else window.location.assign(path);
+  else navigate(path);
 }
 
 /** Install if missing, otherwise play. */
-export function actOn(g: ConsoleGame, lib: Lib) {
-  if (g.kind === "app" || lib.installed.includes(g.id)) playGame(g);
+export function actOn(g: ConsoleGame, lib: Lib, navigate: (path: string) => void) {
+  if (g.kind === "app" || lib.installed.includes(g.id)) playGame(g, navigate);
   else installGame(g.id);
 }
 
