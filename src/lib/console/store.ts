@@ -69,7 +69,7 @@ export function playGame(g: ConsoleGame) {
 
 /** Install if missing, otherwise play. */
 export function actOn(g: ConsoleGame, lib: Lib) {
-  if (lib.installed.includes(g.id)) playGame(g);
+  if (g.kind === "app" || lib.installed.includes(g.id)) playGame(g);
   else installGame(g.id);
 }
 
