@@ -126,6 +126,9 @@ create policy "own playlists" on public.playlists for all to authenticated using
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.has_role(uuid, public.app_role) from public, anon;
 
+insert into storage.buckets (id, name, public) values ('astra-images','astra-images',false) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('backgrounds','backgrounds',false) on conflict (id) do nothing;
+
 CREATE POLICY "Users can view their own generated images" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'astra-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 CREATE POLICY "Users can save their own generated images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'astra-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 CREATE POLICY "Users can manage their own generated images" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'astra-images' AND (storage.foldername(name))[1] = auth.uid()::text);
@@ -133,7 +136,9 @@ CREATE POLICY "Users can delete their own generated images" ON storage.objects F
 CREATE POLICY "bg own read" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'backgrounds' AND (storage.foldername(name))[1] = auth.uid()::text);
 CREATE POLICY "bg own insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'backgrounds' AND (storage.foldername(name))[1] = auth.uid()::text);
 CREATE POLICY "bg own update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'backgrounds' AND (storage.foldername(name))[1] = auth.uid()::text);
-CREATE POLICY "bg own delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'backgrounds' AND (storage.foldername(name))[1] = auth.uid()::text);CREATE TABLE public.game_saves (
+CREATE POLICY "bg own delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'backgrounds' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE TABLE public.game_saves (
   user_id uuid NOT NULL,
   game text NOT NULL,
   data jsonb NOT NULL DEFAULT '{}'::jsonb,
