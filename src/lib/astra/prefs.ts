@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 
 export type Prefs = {
   layout: "classic" | "launcher";
+  console: "off" | "sony" | "series" | "classic";
   accent: "star" | "rose" | "ember" | "mint" | "sky" | "violet" | "lime" | "gold" | "coral" | "aqua";
   palette: "default" | "midnight" | "forest" | "ocean" | "sunset" | "mono" | "candy" | "dracula" | "nord" | "cyberpunk" | "coffee" | "sakura" | "matrix" | "arctic" | "lava" | "royal" | "synthwave" | "paper" | "mint" | "galaxy";
   focus: "" | "all" | "music" | "movies" | "web" | "games" | "ai";
@@ -35,6 +36,7 @@ export type Prefs = {
 
 export const DEFAULT_PREFS: Prefs = {
   layout: "classic",
+  console: "off",
   focus: "",
   device: "",
   customBg: "",

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
@@ -73,6 +73,7 @@ function SettingsPage() {
   const p = usePrefs();
   const [tab, setTab] = useState<TabName>("Layout");
   const set = (x: Partial<Prefs>) => setPrefs(x);
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -103,6 +104,7 @@ function SettingsPage() {
               />
             </Card>
             <Card title="Home screen">
+            </Card>
               <Row title="Title"><Input className="w-44" value={p.homeName} onChange={(e) => set({ homeName: e.target.value })} /></Row>
               <Row title="Tagline"><Input className="w-56" value={p.tagline} onChange={(e) => set({ tagline: e.target.value })} /></Row>
               <Row title="Show clock"><Switch checked={p.showClock} onCheckedChange={(showClock) => set({ showClock })} /></Row>
