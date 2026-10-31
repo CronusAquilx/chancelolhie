@@ -249,3 +249,30 @@ html[data-device="phone"][data-custombg="on"] main, html[data-device="tablet"][d
 
 html.perf-lite *, html.perf-lite *::before, html.perf-lite *::after { animation: none !important; transition: none !important; backdrop-filter: none !important; box-shadow: none !important; text-shadow: none !important; }
 html.perf-lite body { background-image: none !important; }
+
+/* Console colors are scoped so saved app appearance remains untouched. */
+@theme inline {
+  --color-console-background: var(--console-background);
+  --color-console-foreground: var(--console-foreground);
+  --color-console-ink: var(--console-ink);
+  --color-console-online: var(--console-online);
+  --color-console-particle: var(--console-particle);
+  --color-console-panel: var(--console-panel);
+}
+:root {
+  --console-background: #090b10;
+  --console-foreground: #fff;
+  --console-ink: #000;
+  --console-online: #34d399;
+  --console-particle: #fde68a;
+  --console-panel: #171717;
+  --console-art: radial-gradient(120% 90% at 20% 10%, hsl(var(--console-art-hue) 80% 60% / .9), transparent 60%), linear-gradient(160deg, hsl(var(--console-art-hue) 60% 28%), hsl(var(--console-art-secondary) 70% 12%));
+  --console-scene: radial-gradient(70% 60% at 75% 35%, hsl(var(--console-hue, 235) 70% 35% / .55), transparent 70%), radial-gradient(60% 50% at 10% 100%, hsl(var(--console-secondary, 295) 60% 25% / .5), transparent 70%);
+  --console-profile-scene: radial-gradient(60% 50% at 30% 0%, hsl(30 30% 40% / .55), transparent 70%), linear-gradient(180deg, #17151a, #0a0b10);
+  --console-avatar: linear-gradient(to bottom right, #64748b, #0f172a);
+}
+.console-shell { letter-spacing: 0; }
+.console-shell button { white-space: normal; }
+@media (prefers-reduced-motion: reduce) {
+  .console-shell *, .console-shell *::before, .console-shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

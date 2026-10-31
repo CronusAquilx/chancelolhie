@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Bot, Brain, Film, Gamepad2, Globe, LayoutGrid, Search, Settings } from "lucide-react";
+import { Bot, Brain, Film, Gamepad2, Globe, LayoutGrid, Search, Settings, Tv } from "lucide-react";
 import { usePrefs } from "@/lib/astra/prefs";
 import { MobileMenuButton } from "@/components/astra/AppShell";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 const APPS = [
   { to: "/games", label: "Games", icon: Gamepad2 },
+  { to: "/console", label: "Console", icon: Tv },
   { to: "/chat", label: "AI", icon: Bot },
   { to: "/movies", label: "Movies", icon: Film },
   { to: "/web", label: "Web", icon: Globe },

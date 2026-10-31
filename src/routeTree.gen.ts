@@ -32,6 +32,11 @@ import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiVoiceReplyRouteImport } from './routes/api/voice-reply'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
+import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
+import { Route as AuthenticatedConsoleLibraryRouteImport } from './routes/_authenticated/console.library'
+import { Route as AuthenticatedConsoleProfileRouteImport } from './routes/_authenticated/console.profile'
+import { Route as AuthenticatedConsoleSettingsRouteImport } from './routes/_authenticated/console.settings'
+import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
 import { Route as AuthenticatedMoviesIndexRouteImport } from './routes/_authenticated/movies.index'
 import { Route as ScramjetPSplatRouteImport } from './routes/scramjet.p.$'
 import { Route as AuthenticatedMoviesFreeVideoIdRouteImport } from './routes/_authenticated/movies.free.$videoId'
@@ -157,6 +162,36 @@ const AuthenticatedChatThreadIdRoute =
     path: '/chat/$threadId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleIndexRoute =
+  AuthenticatedConsoleIndexRouteImport.update({
+    id: '/console/',
+    path: '/console/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleLibraryRoute =
+  AuthenticatedConsoleLibraryRouteImport.update({
+    id: '/console/library',
+    path: '/console/library',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleProfileRoute =
+  AuthenticatedConsoleProfileRouteImport.update({
+    id: '/console/profile',
+    path: '/console/profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSettingsRoute =
+  AuthenticatedConsoleSettingsRouteImport.update({
+    id: '/console/settings',
+    path: '/console/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleStoreRoute =
+  AuthenticatedConsoleStoreRouteImport.update({
+    id: '/console/store',
+    path: '/console/store',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMoviesIndexRoute =
   AuthenticatedMoviesIndexRouteImport.update({
     id: '/movies/',
@@ -231,8 +266,13 @@ export interface FileRoutesByFullPath {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/console/profile': typeof AuthenticatedConsoleProfileRoute
+  '/console/settings': typeof AuthenticatedConsoleSettingsRoute
+  '/console/store': typeof AuthenticatedConsoleStoreRoute
   '/scramjet/p/$': typeof ScramjetPSplatRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
+  '/console/': typeof AuthenticatedConsoleIndexRoute
   '/movies/': typeof AuthenticatedMoviesIndexRoute
   '/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
@@ -264,8 +304,13 @@ export interface FileRoutesByTo {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/console/profile': typeof AuthenticatedConsoleProfileRoute
+  '/console/settings': typeof AuthenticatedConsoleSettingsRoute
+  '/console/store': typeof AuthenticatedConsoleStoreRoute
   '/scramjet/p/$': typeof ScramjetPSplatRoute
   '/chat': typeof AuthenticatedChatIndexRoute
+  '/console': typeof AuthenticatedConsoleIndexRoute
   '/movies': typeof AuthenticatedMoviesIndexRoute
   '/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
@@ -299,8 +344,13 @@ export interface FileRoutesById {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/_authenticated/console/profile': typeof AuthenticatedConsoleProfileRoute
+  '/_authenticated/console/settings': typeof AuthenticatedConsoleSettingsRoute
+  '/_authenticated/console/store': typeof AuthenticatedConsoleStoreRoute
   '/scramjet/p/$': typeof ScramjetPSplatRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
+  '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/movies/': typeof AuthenticatedMoviesIndexRoute
   '/_authenticated/movies/free/$videoId': typeof AuthenticatedMoviesFreeVideoIdRoute
   '/_authenticated/movies/person/$id': typeof AuthenticatedMoviesPersonIdRoute
@@ -334,8 +384,13 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/chat/$threadId'
+    | '/console/library'
+    | '/console/profile'
+    | '/console/settings'
+    | '/console/store'
     | '/scramjet/p/$'
     | '/chat/'
+    | '/console/'
     | '/movies/'
     | '/movies/free/$videoId'
     | '/movies/person/$id'
@@ -367,8 +422,13 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/chat/$threadId'
+    | '/console/library'
+    | '/console/profile'
+    | '/console/settings'
+    | '/console/store'
     | '/scramjet/p/$'
     | '/chat'
+    | '/console'
     | '/movies'
     | '/movies/free/$videoId'
     | '/movies/person/$id'
@@ -401,8 +461,13 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/_authenticated/chat/$threadId'
+    | '/_authenticated/console/library'
+    | '/_authenticated/console/profile'
+    | '/_authenticated/console/settings'
+    | '/_authenticated/console/store'
     | '/scramjet/p/$'
     | '/_authenticated/chat/'
+    | '/_authenticated/console/'
     | '/_authenticated/movies/'
     | '/_authenticated/movies/free/$videoId'
     | '/_authenticated/movies/person/$id'
@@ -594,6 +659,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/': {
+      id: '/_authenticated/console/'
+      path: '/console'
+      fullPath: '/console/'
+      preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/library': {
+      id: '/_authenticated/console/library'
+      path: '/console/library'
+      fullPath: '/console/library'
+      preLoaderRoute: typeof AuthenticatedConsoleLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/profile': {
+      id: '/_authenticated/console/profile'
+      path: '/console/profile'
+      fullPath: '/console/profile'
+      preLoaderRoute: typeof AuthenticatedConsoleProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/settings': {
+      id: '/_authenticated/console/settings'
+      path: '/console/settings'
+      fullPath: '/console/settings'
+      preLoaderRoute: typeof AuthenticatedConsoleSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/store': {
+      id: '/_authenticated/console/store'
+      path: '/console/store'
+      fullPath: '/console/store'
+      preLoaderRoute: typeof AuthenticatedConsoleStoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/movies/': {
       id: '/_authenticated/movies/'
       path: '/movies'
@@ -671,7 +771,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVoiceRoute: typeof AuthenticatedVoiceRoute
   AuthenticatedWebRoute: typeof AuthenticatedWebRoute
   AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedConsoleLibraryRoute: typeof AuthenticatedConsoleLibraryRoute
+  AuthenticatedConsoleProfileRoute: typeof AuthenticatedConsoleProfileRoute
+  AuthenticatedConsoleSettingsRoute: typeof AuthenticatedConsoleSettingsRoute
+  AuthenticatedConsoleStoreRoute: typeof AuthenticatedConsoleStoreRoute
   AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
+  AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
   AuthenticatedMoviesIndexRoute: typeof AuthenticatedMoviesIndexRoute
   AuthenticatedMoviesFreeVideoIdRoute: typeof AuthenticatedMoviesFreeVideoIdRoute
   AuthenticatedMoviesPersonIdRoute: typeof AuthenticatedMoviesPersonIdRoute
@@ -691,7 +796,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVoiceRoute: AuthenticatedVoiceRoute,
   AuthenticatedWebRoute: AuthenticatedWebRoute,
   AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedConsoleLibraryRoute: AuthenticatedConsoleLibraryRoute,
+  AuthenticatedConsoleProfileRoute: AuthenticatedConsoleProfileRoute,
+  AuthenticatedConsoleSettingsRoute: AuthenticatedConsoleSettingsRoute,
+  AuthenticatedConsoleStoreRoute: AuthenticatedConsoleStoreRoute,
   AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
+  AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
   AuthenticatedMoviesIndexRoute: AuthenticatedMoviesIndexRoute,
   AuthenticatedMoviesFreeVideoIdRoute: AuthenticatedMoviesFreeVideoIdRoute,
   AuthenticatedMoviesPersonIdRoute: AuthenticatedMoviesPersonIdRoute,

@@ -19,7 +19,7 @@ function AuthedLayout() {
     );
   if (!session) return <Navigate to="/auth" replace />;
   // The full-tab game player shows only the game (no sidebar or welcome prompts).
-  if (pathname === "/play") return <Outlet />;
+  if (pathname === "/play" || pathname.startsWith("/console")) return <Outlet />;
   return (
     <AppShell>
       <Outlet />

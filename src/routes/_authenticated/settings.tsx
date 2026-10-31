@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
@@ -73,6 +73,7 @@ function SettingsPage() {
   const p = usePrefs();
   const [tab, setTab] = useState<TabName>("Layout");
   const set = (x: Partial<Prefs>) => setPrefs(x);
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -101,6 +102,18 @@ function SettingsPage() {
                   { v: "launcher", label: "Launcher", sub: "Icon rail, address bar & home screen" },
                 ]}
               />
+            </Card>
+            <Card title="Console mode">
+              <Choice
+                value={p.console === "off" ? "sony" : p.console}
+                onChange={(c) => set({ console: c })}
+                options={[
+                  { v: "sony", label: "Sony Console", sub: "Dark home row, big-tile store" },
+                  { v: "series", label: "Xbox Series", sub: "Hero home, guide sidebar, mosaic store" },
+                  { v: "classic", label: "Xbox Classic", sub: "Resume tile, discover row, pins guide" },
+                ]}
+              />
+              <Row title="Open Console Mode" desc="Controller, keyboard (arrows, Enter, Esc, Q/E, G) and touch all work."><Button size="sm" onClick={() => navigate({ to: "/console" })}>Launch</Button></Row>
             </Card>
             <Card title="Home screen">
               <Row title="Title"><Input className="w-44" value={p.homeName} onChange={(e) => set({ homeName: e.target.value })} /></Row>
