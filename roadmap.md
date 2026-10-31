@@ -8,3 +8,9 @@
 - [ ] Reconcile config files (vite.config, tsconfig, styles, index.html equivalent)
 - [ ] Verify build + preview runs
 - [ ] Records/user data: none exported — mark pending
+
+## Game smoothness
+- [ ] Apply GTA's supported performance profile with a native-quality option.
+- [ ] Use the standalone player by default for every Cloud game and lighten inline playback.
+- [ ] Remove proxy connection-selection delays and verify gameplay launch behavior.
+- [ ] Verify signed-in launches (requires the user to sign in to the preview).

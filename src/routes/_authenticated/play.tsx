@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { usePrefs } from "@/lib/astra/prefs";
 import { openProxied } from "@/lib/astra/proxy";
+import { Button } from "@/components/ui/button";
+import { gameRelayUrl, useGameplayPerformance, type GameQuality } from "@/lib/games/performance";
 
 // Full-tab game player: opens a game through the Astra proxy in its own browser tab.
 export const Route = createFileRoute("/_authenticated/play")({
@@ -11,20 +13,12 @@ export const Route = createFileRoute("/_authenticated/play")({
   component: Play,
 });
 
-// Sites served by a dedicated relay on Astra's own domain (much faster than the in-page proxy
-// for huge games, and cross-origin isolated because they open as the whole tab).
-function directRelay(url: string): string | null {
-  try {
-    const h = new URL(url).hostname;
-    if (h === "fiveplay.lol" || h === "www.fiveplay.lol" || h === "gta.deloskiyt.pl") return "/api/public/fp/";
-  } catch { /* ignore */ }
-  return null;
-}
-
 function Play() {
   const { url, name } = Route.useSearch();
-  const direct = directRelay(url);
+  const [quality, setQuality] = useState<GameQuality>("performance");
+  const direct = gameRelayUrl(url, quality);
   const prefs = usePrefs();
+  useGameplayPerformance();
   const ref = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
   // Big games can run the browser out of memory. Never auto-start, so a restored/reloaded tab
@@ -63,7 +57,7 @@ function Play() {
     openProxied(iframe, url, prefs).catch((e) => setError(e instanceof Error ? e.message : String(e)));
     return () => iframe.removeEventListener("load", keepInside);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [started, url, prefs.transport, prefs.wisp]);
+  }, [started, url, direct, prefs.transport, prefs.wisp]);
 
   return (
     <div className="fixed inset-0 z-50 bg-background">
@@ -73,13 +67,19 @@ function Play() {
         <div className="flex h-full items-center justify-center p-6">
           <div className="max-w-md space-y-4 rounded-xl border border-border bg-card p-6 text-card-foreground">
             <h1 className="text-xl font-semibold">{name || "Game"}</h1>
-            <p className="text-sm text-muted-foreground">This is a very big game. It can use several GB of memory, and if your computer runs out, the browser crashes.</p>
+            {direct && <label className="block space-y-2 text-sm">Graphics
+              <select aria-label="Graphics quality" value={quality} onChange={(e) => setQuality(e.target.value as GameQuality)} className="block w-full rounded-md border border-input bg-background px-3 py-2">
+                <option value="performance">Performance</option>
+                <option value="balanced">Balanced</option>
+                <option value="native">Original quality</option>
+              </select>
+            </label>}
             {crashedBefore && <p className="text-sm text-destructive">This game didn't close properly last time, which usually means the browser ran out of memory.</p>}
             {lowMemory && <p className="text-sm text-destructive">Your device reports less than 8 GB of memory, so this game will probably crash.</p>}
             <p className="text-sm text-muted-foreground">Before starting: close other tabs and apps.</p>
             <div className="flex gap-2">
-              <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" onClick={() => setStarted(true)}>Start game</button>
-              <button className="rounded-md border border-border px-4 py-2 text-sm" onClick={() => window.close()}>Close tab</button>
+              <Button onClick={() => setStarted(true)}>Start game</Button>
+              <Button variant="outline" onClick={() => window.close()}>Close tab</Button>
             </div>
           </div>
         </div>
