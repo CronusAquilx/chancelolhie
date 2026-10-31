@@ -1,5 +1,10 @@
 # Birchbeat import roadmap
 
+## Console Mode
+- [ ] Shared navigation, per-user library, Sony home/store/library/settings/profile.
+- [ ] Xbox Series and Xbox Classic screens and guides.
+- [ ] Settings picker, Home entry, documentation and verification.
+
 - [x] Import source and dependencies into the existing TanStack project.
 - [x] Enable Lovable Cloud, migrate schema and wire authentication.
 - [x] Reconcile configuration and verify preview launches.
