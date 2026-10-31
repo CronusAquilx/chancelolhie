@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { usePrefs } from "@/lib/astra/prefs";
 import { useAuth } from "@/lib/auth";
 import { AstraMark } from "@/components/astra/Mark";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const { session } = useAuth();
+  const p = usePrefs();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
@@ -34,8 +36,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (session) navigate({ to: "/chat", replace: true });
-  }, [session, navigate]);
+    if (session) navigate({ to: p.console !== "off" ? "/console" : "/chat", replace: true });
+  }, [session, p.console, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

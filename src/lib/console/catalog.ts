@@ -1,34 +1,40 @@
 import type { CSSProperties } from "react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { CLOUD_GAMES } from "@/lib/games/cloud-catalog";
 
 export type ConsoleGame = {
-  id: string;
-  title: string;
-  tagline: string;
-  genre: string;
-  hue: number;
+  id: string; title: string; tagline: string; genre: string; hue: number;
   badge: "Free" | "Included" | "New";
-  /** Optional launch link. Add your own games here. */
-  url?: string;
+  kind: "cloud" | "arcade" | "app"; url?: string; file?: string;
 };
-
-// Original demo catalog. Replace/extend with your own games.
-export const CATALOG: ConsoleGame[] = [
-  { id: "neon-drift", title: "Neon Drift", tagline: "Slide through the city after midnight.", genre: "Racing", hue: 290, badge: "Free" },
-  { id: "skyline-siege", title: "Skyline Siege", tagline: "Hold the rooftops. Hold the line.", genre: "Strategy", hue: 210, badge: "Included" },
-  { id: "ember-vault", title: "Ember Vault", tagline: "Something old is burning below.", genre: "Adventure", hue: 18, badge: "New" },
-  { id: "tidebreaker", title: "Tidebreaker", tagline: "Ride the storm to the edge of the map.", genre: "Action", hue: 190, badge: "Free" },
-  { id: "lumen-run", title: "Lumen Run", tagline: "Outrun the dark, one light at a time.", genre: "Platformer", hue: 55, badge: "Included" },
-  { id: "hollow-peaks", title: "Hollow Peaks", tagline: "Climb together. Fall together.", genre: "Co-op", hue: 150, badge: "Free" },
-  { id: "orbit-smith", title: "Orbit Smith", tagline: "Build a station. Survive the silence.", genre: "Sim", hue: 250, badge: "Included" },
-  { id: "pixel-harbor", title: "Pixel Harbor", tagline: "A cozy port town needs a captain.", genre: "Sim", hue: 175, badge: "Free" },
-  { id: "glasswing", title: "Glasswing", tagline: "Fragile wings. Fearless flight.", genre: "Adventure", hue: 320, badge: "New" },
-  { id: "cinder-court", title: "Cinder Court", tagline: "Settle it on the sand.", genre: "Fighting", hue: 5, badge: "Free" },
-  { id: "moss-and-mortar", title: "Moss & Mortar", tagline: "Rebuild the ruins, stone by stone.", genre: "Puzzle", hue: 120, badge: "Included" },
-  { id: "static-bloom", title: "Static Bloom", tagline: "Tune in. Something is growing.", genre: "Puzzle", hue: 270, badge: "Free" },
+export type ArcadeGame = { id: number; name: string; author: string; file: string; cover: string };
+export const APPS: ConsoleGame[] = [
+  { id: "app-music", title: "Music", tagline: "Your sound. Your next favorite.", genre: "Media", hue: 160, badge: "Included", kind: "app", url: "/music" },
+  { id: "app-movies", title: "Movies", tagline: "A little escape. A whole new world.", genre: "Media", hue: 35, badge: "Included", kind: "app", url: "/movies" },
+  { id: "app-ai", title: "AI", tagline: "A conversation worth starting.", genre: "Apps", hue: 235, badge: "Included", kind: "app", url: "/chat" },
+  { id: "app-web", title: "Web", tagline: "Beyond your home screen.", genre: "Apps", hue: 200, badge: "Included", kind: "app", url: "/web" },
+  { id: "app-voice", title: "Voice", tagline: "Talk it through.", genre: "Apps", hue: 310, badge: "Included", kind: "app", url: "/voice" },
+  { id: "app-memory", title: "Memory", tagline: "Keep what matters.", genre: "Apps", hue: 85, badge: "Included", kind: "app", url: "/memory" },
 ];
-
-export const gameById = (id: string | null | undefined) => (id ? CATALOG.find((g) => g.id === id) : undefined);
-
-export function artStyle(hue: number): CSSProperties {
-  return { "--console-art-hue": hue, "--console-art-secondary": (hue + 50) % 360, backgroundImage: "var(--console-art)" } as CSSProperties;
+export function tileHue(title: string) { return [...title].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 0); }
+export const CATALOG: ConsoleGame[] = CLOUD_GAMES.map(g => ({ id: `cloud:${g.url}`, title: g.name, tagline: "Ready when you are.", genre: "Cloud games", hue: tileHue(g.name), badge: "Free", kind: "cloud", url: g.url }));
+export function fromArcade(g: ArcadeGame): ConsoleGame { return { id: `arcade:${g.file}`, title: g.name, tagline: g.author, genre: "Arcade", hue: tileHue(g.name), badge: "Free", kind: "arcade", file: g.file }; }
+export const consoleCatalogOptions = queryOptions({
+  queryKey: ["console-catalog"], staleTime: 60 * 60 * 1000,
+  queryFn: async () => {
+    const response = await fetch("/api/public/games/list");
+    if (!response.ok) throw new Error("Arcade games couldn't load. Try again.");
+    const raw: unknown = await response.json();
+    if (!Array.isArray(raw)) throw new Error("Arcade games couldn't load. Try again.");
+    const arcade = raw.filter((g): g is ArcadeGame => !!g && typeof g.id === "number" && typeof g.name === "string" && typeof g.file === "string" && /^[A-Za-z0-9._-]+\.html?$/.test(g.file));
+    return { arcade, games: [...CATALOG, ...arcade.map(fromArcade), ...APPS] };
+  },
+});
+export const useCatalog = () => useSuspenseQuery(consoleCatalogOptions).data;
+export const gameById = (id: string | null | undefined, games: ConsoleGame[] = [...CATALOG, ...APPS]) => games.find(g => g.id === id);
+export function launchPath(g: ConsoleGame) {
+  if (g.kind === "arcade" && g.file) return `/console/arcade?game=${encodeURIComponent(g.file)}`;
+  if (g.kind === "cloud" && g.url) return `/play?url=${encodeURIComponent(g.url)}&name=${encodeURIComponent(g.title)}`;
+  return g.kind === "app" && g.url?.startsWith("/") ? g.url : "/console";
 }
+export function artStyle(hue: number): CSSProperties { return { "--console-art-hue": hue, "--console-art-secondary": (hue + 50) % 360 } as CSSProperties; }

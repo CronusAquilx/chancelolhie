@@ -18,8 +18,10 @@ export function useConsoleInput(handler: (a: NavAction) => void, enabled = true)
     if (!enabled) return;
     const onKey = (ev: KeyboardEvent) => {
       const t = ev.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
       const a = KEYS[ev.key];
+      if (a === "select" && t?.closest("button")) return;
+      if (t?.closest("[role=dialog]") && a !== "back") return;
       if (a) { ev.preventDefault(); ref.current(a); }
     };
     window.addEventListener("keydown", onKey);
@@ -34,7 +36,11 @@ export function useConsoleInput(handler: (a: NavAction) => void, enabled = true)
           const b = Number(k);
           const id = pad.index * 100 + b;
           const pressed = !!pad.buttons[b]?.pressed;
-          if (pressed && !was[id]) ref.current(a);
+          if (pressed && !was[id]) {
+            const focused = document.activeElement;
+            if (a === "select" && focused instanceof HTMLButtonElement) focused.click();
+            else ref.current(a);
+          }
           was[id] = pressed;
         }
         const now = performance.now();
