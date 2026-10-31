@@ -41,6 +41,7 @@ export function AuthPage() {
       if (mode === "in") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        enter();
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -49,6 +50,7 @@ export function AuthPage() {
         });
         if (error) throw error;
         if (!data.session) toast.success("Check your inbox to confirm your email.");
+        else enter();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -93,13 +95,13 @@ export function AuthPage() {
             {mode === "in" ? "New here? Create an account" : "Have an account? Sign in"}
           </button>
         </div>
-        <AdminMode />
+        <AdminMode onSuccess={enter} />
   </>;
   if (p.console !== "off") return <ConsoleLogin name={String(name)} initial={String(name).slice(0,1).toUpperCase()} returning={!!session && !useOther} onContinue={enter} onOther={()=>setUseOther(true)} onBack={()=>send("restart")}>{form}</ConsoleLogin>;
   return <div className="relative flex min-h-dvh items-center justify-center bg-background px-5 sky"><div className="w-full max-w-sm animate-rise"><Button variant="ghost" onClick={()=>send("restart")} className="mb-6">Change layout</Button><div className="mb-10 text-center"><AstraMark className="mx-auto size-9"/><h1 className="mt-5 font-display text-5xl">BirchBlock</h1><p className="mt-3 text-sm text-muted-foreground">{session && !useOther ? "Welcome back" : "Sign in to your account"}</p></div>{session&&!useOther?<div className="space-y-3 rounded-lg border bg-card/80 p-6 text-center"><p className="text-lg">{String(name)}</p><Button className="w-full" onClick={enter}>Continue as {String(name)}</Button><Button variant="ghost" className="w-full" onClick={()=>setUseOther(true)}>Use another account</Button></div>:form}</div></div>;
 }
 
-function AdminMode() {
+function AdminMode({onSuccess}:{onSuccess:()=>void}) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [account, setAccount] = useState<"qais" | "chance">("qais");
@@ -114,6 +116,7 @@ function AdminMode() {
       if (!res.ok) throw new Error(res.error);
       const { error } = await supabase.auth.verifyOtp({ token_hash: res.tokenHash, type: "magiclink" });
       if (error) throw error;
+      onSuccess();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't sign in");
     } finally {
