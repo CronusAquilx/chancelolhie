@@ -4,7 +4,7 @@ import { consoleCatalogOptions } from "@/lib/console/catalog";
 import { Player } from "./games";
 import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/console/arcade")({
- validateSearch: (s: Record<string,unknown>) => ({game: typeof s.game === "string" ? s.game : ""}),
+ validateSearch: (s: Record<string,unknown>) => ({game: typeof s["game"] === "string" ? s["game"] : ""}),
  loader: ({context}) => context.queryClient.ensureQueryData(consoleCatalogOptions),
  head: () => ({meta:[{title:"Arcade Player — BirchBlock"},{name:"description",content:"Play your arcade library with your existing game saves."},{property:"og:title",content:"Arcade Player — BirchBlock"},{property:"og:description",content:"Play your arcade library with your existing game saves."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),
  component: Arcade,

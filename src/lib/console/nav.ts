@@ -71,12 +71,12 @@ export function moveGrid(index: number, count: number, cols: number, a: NavActio
 export function moveShelf(pos: { r: number; c: number }, lens: number[], a: NavAction) {
   let { r, c } = pos;
   if (a === "left") c = Math.max(0, c - 1);
-  else if (a === "right") c = Math.min(Math.max(0, lens[r] - 1), c + 1);
+  else if (a === "right") c = Math.min(Math.max(0, (lens[r] ?? 0) - 1), c + 1);
   else if (a === "up" || a === "down") {
     const step = a === "up" ? -1 : 1;
     let nr = r + step;
     while (nr >= 0 && nr < lens.length && lens[nr] === 0) nr += step;
-    if (nr >= 0 && nr < lens.length) { r = nr; c = Math.min(c, lens[r] - 1); }
+    if (nr >= 0 && nr < lens.length) { r = nr; c = Math.min(c, (lens[r] ?? 0) - 1); }
   }
   return { r, c };
 }

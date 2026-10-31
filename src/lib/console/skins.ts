@@ -45,7 +45,7 @@ export function runSetting(id: SettingId, p: Prefs, go: (to: string) => void): s
     case "screen": setPrefs({ perfMode: !p.perfMode }); return `Performance mode ${!p.perfMode ? "on" : "off"}`;
     case "users": go("/console/profile"); return "";
     case "skin": {
-      const next = SKINS[(SKINS.indexOf(resolveSkin(p.console)) + 1) % SKINS.length];
+      const next = SKINS[(SKINS.indexOf(resolveSkin(p.console)) + 1) % SKINS.length] ?? "sony";
       setPrefs({ console: next }); return `Skin: ${SKIN_NAME[next]}`;
     }
     case "exit": go("/home"); return "";

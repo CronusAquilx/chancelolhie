@@ -11,7 +11,7 @@ export function GameArt({ game, className, title = true, titleClass }: { game: C
 export function statusOf(g: ConsoleGame, lib: Lib) {
   if (g.kind === "app") return "Ready to open";
   if (lib.installed.includes(g.id)) return "Installed";
-  if (g.id in lib.progress) return `Installing ${Math.floor(lib.progress[g.id])}%`;
+  if (g.id in lib.progress) return `Installing ${Math.floor(lib.progress[g.id] ?? 0)}%`;
   return g.kind === "cloud" ? "Get" : "Free";
 }
 export function Avatar({ initial, className }: { initial: string; className?: string }) { return <span className={cn("console-avatar flex items-center justify-center rounded-full font-semibold", className)}>{initial}</span>; }
