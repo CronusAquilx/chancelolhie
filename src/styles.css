@@ -323,3 +323,6 @@ html.perf-lite body { background-image: none !important; }
  .console-feature p { margin-top: 10px; }
  .console-feature > div { margin-top: 16px; }
 }
+
+.console-login-form { --background: var(--console-background); --foreground: var(--console-foreground); --card: var(--console-panel); --primary: var(--console-foreground); --primary-foreground: var(--console-ink); --muted-foreground: color-mix(in oklch,var(--console-foreground) 60%,transparent); --border: color-mix(in oklch,var(--console-foreground) 20%,transparent); --input: var(--border); }
+.console-login-form input { color: var(--console-foreground); }
