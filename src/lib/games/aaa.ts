@@ -54,7 +54,7 @@ export const AAA_GAMES: { name: string; url: string }[] = [
  },
  {
   "name": "Grand Theft Auto V",
-  "url": "https://gta.deloskiyt.pl/"
+  "url": "https://fiveplay.lol/"
  },
  {
   "name": "Grand Theft Auto: Vice City",
