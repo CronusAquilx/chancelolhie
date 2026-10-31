@@ -32,14 +32,16 @@ async function relay(request: Request): Promise<Response> {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: ISOLATION });
   const path = url.pathname.slice(PREFIX.length) || "/";
   if (path.split("/").some((s) => s === ".." || s === ".")) return new Response("Not found", { status: 404, headers: ISOLATION });
-  // Diagnostics the page posts to its own dev server: not needed here.
-  if (request.method === "POST" || path.startsWith("/shot")) return new Response(null, { status: 204, headers: ISOLATION });
+  // The data loader POSTs batched block lists to /data/batch; other POSTs (logs) and screenshots are diagnostics.
+  const isBatch = request.method === "POST" && path.startsWith("/data/batch");
+  if ((request.method === "POST" && !isBatch) || path.startsWith("/shot")) return new Response(null, { status: 204, headers: ISOLATION });
 
   const fwd: Record<string, string> = { "user-agent": UA };
-  for (const h of ["range", "if-none-match", "if-modified-since"]) { const v = request.headers.get(h); if (v) fwd[h] = v; }
+  for (const h of ["range", "if-none-match", "if-modified-since", "content-type"]) { const v = request.headers.get(h); if (v) fwd[h] = v; }
   let upstream: Response;
   try {
-    upstream = await fetch(`${UPSTREAM}${path}${url.search}`, { method: request.method === "HEAD" ? "HEAD" : "GET", headers: fwd, redirect: "follow" });
+    const method = isBatch ? "POST" : request.method === "HEAD" ? "HEAD" : "GET";
+    upstream = await fetch(`${UPSTREAM}${path}${url.search}`, { method, headers: fwd, body: isBatch ? await request.arrayBuffer() : undefined, redirect: "follow" });
   } catch {
     return new Response("Game server unreachable", { status: 502, headers: ISOLATION });
   }
