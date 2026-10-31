@@ -22,7 +22,7 @@ const ISOLATION = {
 
 /** Points the site's root-relative URLs (build folder, data folder, log) at this relay. */
 export function rewriteFiveplay(text: string, html: boolean): string {
-  let out = text.replace(/(['"`])\/(b\/[0-9a-f]|data\/(?=['"`])|log(?=['"`])|shot\?)/g, (_m, q: string, p: string) => `${q}${PREFIX}/${p}`);
+  let out = text.replace(/(['"`])\/(b\/[0-9a-f]|data\/(?=['"`]|manifest\.json)|log(?=['"`])|shot\?)/g, (_m, q: string, p: string) => `${q}${PREFIX}/${p}`);
   if (html) out = out.replace(/<script\b[^>]*>[^<]*<\/script>/gi, (tag) => (/quge5\.com|alwingulla\.com/i.test(tag) ? "" : tag)); // ad scripts
   return out;
 }
