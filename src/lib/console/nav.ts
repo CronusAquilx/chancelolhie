@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { usePrefs } from "@/lib/astra/prefs";
 
 export type NavAction = "up" | "down" | "left" | "right" | "select" | "back" | "prev" | "next" | "options" | "menu";
 
@@ -14,13 +15,33 @@ const PAD: Record<number, NavAction> = { 0: "select", 1: "back", 3: "options", 4
 export function useConsoleInput(handler: (a: NavAction) => void, enabled = true) {
   const ref = useRef(handler);
   ref.current = handler;
+  const { consoleSounds } = usePrefs();
+  const sounds = useRef(consoleSounds);
+  sounds.current = consoleSounds;
   useEffect(() => {
     if (!enabled) return;
+    let audio: AudioContext | undefined;
+    const dispatch = (a: NavAction) => {
+      if (sounds.current && ["up", "down", "left", "right", "prev", "next"].includes(a)) {
+        try {
+          audio ??= new AudioContext();
+          void audio.resume();
+          const oscillator = audio.createOscillator(); const gain = audio.createGain();
+          oscillator.frequency.value = 620; gain.gain.setValueAtTime(0.025, audio.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.06);
+          oscillator.connect(gain); gain.connect(audio.destination);
+          oscillator.start(); oscillator.stop(audio.currentTime + 0.07);
+        } catch { /* audio unavailable */ }
+      }
+      ref.current(a);
+    };
     const onKey = (ev: KeyboardEvent) => {
       const t = ev.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
       const a = KEYS[ev.key];
-      if (a) { ev.preventDefault(); ref.current(a); }
+      if (a === "select" && t?.closest("button")) return;
+      if (t?.closest("[role=dialog]") && a !== "back") return;
+      if (a) { ev.preventDefault(); dispatch(a); }
     };
     window.addEventListener("keydown", onKey);
     const was: Record<number, boolean> = {};
@@ -34,7 +55,11 @@ export function useConsoleInput(handler: (a: NavAction) => void, enabled = true)
           const b = Number(k);
           const id = pad.index * 100 + b;
           const pressed = !!pad.buttons[b]?.pressed;
-          if (pressed && !was[id]) ref.current(a);
+          if (pressed && !was[id]) {
+            const focused = document.activeElement;
+            if (a === "select" && focused instanceof HTMLButtonElement) focused.click();
+            else dispatch(a);
+          }
           was[id] = pressed;
         }
         const now = performance.now();
@@ -42,14 +67,14 @@ export function useConsoleInput(handler: (a: NavAction) => void, enabled = true)
         const y = pad.axes[1] ?? 0;
         if ((Math.abs(x) > 0.6 || Math.abs(y) > 0.6) && now - lastStick > 180) {
           lastStick = now;
-          if (Math.abs(x) > Math.abs(y)) ref.current(x > 0 ? "right" : "left");
-          else ref.current(y > 0 ? "down" : "up");
+          if (Math.abs(x) > Math.abs(y)) dispatch(x > 0 ? "right" : "left");
+          else dispatch(y > 0 ? "down" : "up");
         }
       }
       raf = requestAnimationFrame(poll);
     };
     raf = requestAnimationFrame(poll);
-    return () => { window.removeEventListener("keydown", onKey); cancelAnimationFrame(raf); };
+    return () => { window.removeEventListener("keydown", onKey); cancelAnimationFrame(raf); if (audio) void audio.close(); };
   }, [enabled]);
 }
 
@@ -65,12 +90,12 @@ export function moveGrid(index: number, count: number, cols: number, a: NavActio
 export function moveShelf(pos: { r: number; c: number }, lens: number[], a: NavAction) {
   let { r, c } = pos;
   if (a === "left") c = Math.max(0, c - 1);
-  else if (a === "right") c = Math.min(Math.max(0, lens[r] - 1), c + 1);
+  else if (a === "right") c = Math.min(Math.max(0, (lens[r] ?? 0) - 1), c + 1);
   else if (a === "up" || a === "down") {
     const step = a === "up" ? -1 : 1;
     let nr = r + step;
     while (nr >= 0 && nr < lens.length && lens[nr] === 0) nr += step;
-    if (nr >= 0 && nr < lens.length) { r = nr; c = Math.min(c, lens[r] - 1); }
+    if (nr >= 0 && nr < lens.length) { r = nr; c = Math.min(c, (lens[r] ?? 0) - 1); }
   }
   return { r, c };
 }

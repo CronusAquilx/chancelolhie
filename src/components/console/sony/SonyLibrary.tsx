@@ -1,64 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDownUp, Heart, Search, Store } from "lucide-react";
+import { LayoutGrid, Heart, ShoppingBag, ArrowDownUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CATALOG, artStyle } from "@/lib/console/catalog";
-import { actOn, toggleWishlist } from "@/lib/console/store";
+import type { ConsoleGame } from "@/lib/console/catalog";
 import { moveGrid, useCols, useConsoleInput } from "@/lib/console/nav";
 import { useConsoleCtx } from "@/lib/console/ctx";
-import { statusOf } from "../shared";
+import { GameArt, GameDetails, statusOf, BackButton } from "../shared";
 import { ConsoleShell } from "../ConsoleShell";
 import { cn } from "@/lib/utils";
-const CHIPS = ["All", "Installed", "Wishlist", "Free", "Included"] as const;
-export function SonyLibrary() {
-  const { go, lib, p } = useConsoleCtx();
-  const cols = useCols(5, 3, 2);
-  const [chip, setChip] = useState(0);
-  const [byName, setByName] = useState(true);
-  const [i, setI] = useState(0);
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const games = useMemo(() => {
-    let g = [...CATALOG]; const c = CHIPS[chip];
-    if (c === "Installed") g = g.filter((x) => lib.installed.includes(x.id));
-    if (c === "Wishlist") g = g.filter((x) => lib.wishlist.includes(x.id));
-    if (c === "Free") g = g.filter((x) => x.badge === "Free");
-    if (c === "Included") g = g.filter((x) => x.badge === "Included");
-    if (byName) g.sort((a, b) => a.title.localeCompare(b.title));
-    return g;
-  }, [chip, byName, lib.installed, lib.wishlist]);
-  const idx = Math.min(i, Math.max(0, games.length - 1));
-  useEffect(() => { refs.current[idx]?.scrollIntoView({ block: "nearest", behavior: p.reduceMotion ? "auto" : "smooth" }); }, [idx, p.reduceMotion]);
-  useConsoleInput((a) => {
-    if (a === "back" || a === "menu") go("/console");
-    else if (a === "prev") { setChip((c) => (c + CHIPS.length - 1) % CHIPS.length); setI(0); }
-    else if (a === "next") { setChip((c) => (c + 1) % CHIPS.length); setI(0); }
-    else if (a === "options") { const g = games[idx]; if (g) toggleWishlist(g.id); }
-    else if (a === "select") { const g = games[idx]; if (g) actOn(g, lib); }
-    else setI(moveGrid(idx, games.length, cols, a));
-  });
-  return (
-    <ConsoleShell hue={games[idx]?.hue ?? 260}>
-      <div className="flex h-full gap-4 px-4 pt-6 md:gap-8 md:px-10 md:pt-8">
-        <aside className="flex w-12 shrink-0 flex-col items-center gap-4 md:w-14">
-          <Button variant="console" size="console" title="Wishlist" onClick={() => { setChip(2); setI(0); }} className="flex size-12 items-center justify-center rounded-xl bg-console-foreground/15"><Heart className="size-6" /></Button>
-          <Button variant="console" size="console" title="Search store" onClick={() => go("/console/store")} className="flex size-12 items-center justify-center rounded-full bg-console-foreground/10"><Search className="size-5" /></Button>
-          <Button variant="console" size="console" title="Sort" onClick={() => setByName((v) => !v)} className="flex size-12 items-center justify-center rounded-full bg-console-foreground/10"><ArrowDownUp className="size-5" /></Button>
-          <Button variant="console" size="console" title="Store" onClick={() => go("/console/store")} className="flex size-12 items-center justify-center rounded-full bg-console-foreground/10"><Store className="size-5" /></Button>
-        </aside>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <h1 className="text-xl md:text-2xl">Library</h1>
-          <div className="mt-3 flex gap-3 overflow-x-auto text-sm md:text-base [scrollbar-width:none]">{CHIPS.map((c, n) => <Button variant="console" size="console" key={c} onClick={() => { setChip(n); setI(0); }} className={cn("shrink-0 rounded-full px-5 py-1.5", n === chip ? "bg-console-foreground text-console-ink" : "bg-console-foreground/10")}>{c}</Button>)}</div>
-          <div className="mt-4 flex justify-between text-sm text-console-foreground/80"><span>Games: {games.length}</span><span>Sort by: {byName ? "Name (A - Z)" : "Default"}</span></div>
-          {games.length === 0 && <p className="mt-16 text-center text-console-foreground/60">Nothing here yet. Press O on a game to wishlist it, or visit the store.</p>}
-          <div className="mt-3 grid flex-1 content-start gap-3 overflow-y-auto pb-24 md:gap-4" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-            {games.map((g, n) => <Button variant="console" size="console" key={g.id} ref={(el) => { refs.current[n] = el; }} onClick={() => (n === idx ? actOn(g, lib) : setI(n))} className={cn("relative aspect-[4/5] overflow-hidden rounded-lg text-left", n === idx ? "z-10 ring-2 ring-console-foreground" : "opacity-90")} style={artStyle(g.hue)}>
-              <span className="absolute inset-x-2 top-1/3 text-center text-base font-extrabold uppercase leading-tight drop-shadow md:text-xl">{g.title}</span>
-              {lib.wishlist.includes(g.id) && <Heart className="absolute right-2 top-2 size-4 fill-console-foreground" />}
-              <span className="absolute bottom-2 left-2 text-xs font-semibold drop-shadow">{statusOf(g, lib)}</span>
-            </Button>)}
-          </div>
-        </div>
-      </div>
-      <div className="absolute bottom-4 right-4 rounded-lg bg-console-ink/60 px-4 py-2 text-xs backdrop-blur md:bottom-6 md:right-10 md:text-sm">O: Wishlist &nbsp;&nbsp; Q / E: Filter</div>
-    </ConsoleShell>
-  );
+const FILTERS=["All","Games","Apps","Wishlist"];
+export function SonyLibrary({ apps = false }: { apps?: boolean }) {
+ const {go,lib,p,catalog}=useConsoleCtx();const cols=useCols(5,3,2);const [filter,setFilter]=useState(apps?2:0);const [i,setI]=useState(0);const [sort,setSort]=useState(true);const [details,setDetails]=useState<ConsoleGame|null>(null);const refs=useRef<(HTMLButtonElement|null)[]>([]);
+ const games=useMemo(()=>{let list=catalog.games.filter(g=>filter===3?lib.wishlist.includes(g.id):filter===2?g.kind==="app":filter===1?g.kind!=="app"&&lib.installed.includes(g.id):g.kind==="app"||lib.installed.includes(g.id));if(sort)list=[...list].sort((a,b)=>a.title.localeCompare(b.title));return list;},[catalog.games,filter,lib.installed,lib.wishlist,sort]);const idx=Math.min(i,Math.max(0,games.length-1));
+ useEffect(()=>{refs.current[idx]?.focus({preventScroll:true});refs.current[idx]?.scrollIntoView({block:"nearest",behavior:p.reduceMotion?"auto":"smooth"});},[idx,p.reduceMotion]);
+ useConsoleInput(a=>{if(details){if(a==="back")setDetails(null);return;}if(a==="back"||a==="menu")go("/console");else if(a==="prev"||a==="next"){setFilter(f=>(f+(a==="next"?1:3))%4);setI(0);}else if(a==="select"||a==="options")setDetails(games[idx]??null);else setI(moveGrid(idx,games.length,cols,a));});
+ return <ConsoleShell><div className="flex h-full gap-4 px-4 pt-6 md:gap-8 md:px-10 md:pt-8"><aside className="flex shrink-0 flex-col items-center gap-4"><BackButton onClick={()=>go("/console")}/>{[{label:"Apps",icon:LayoutGrid,action:()=>{setFilter(2);setI(0);}},{label:"Wishlist",icon:Heart,action:()=>{setFilter(3);setI(0);}},{label:"Store",icon:ShoppingBag,action:()=>go("/console/store")}].map(r=><Button key={r.label} variant="console" size="console" title={r.label} aria-label={r.label} onClick={r.action} className="size-10 rounded-full bg-console-foreground/10"><r.icon/></Button>)}</aside><div className="flex min-w-0 flex-1 flex-col"><h1 className="text-2xl font-light md:text-3xl">{apps?"App Library":"Your Library"}</h1><nav className="mt-5 flex gap-3 overflow-x-auto pb-2">{FILTERS.map((c,n)=><Button key={c} variant="console" size="console" onClick={()=>{setFilter(n);setI(0);}} className={cn("shrink-0 rounded-full px-5 py-2",filter===n?"bg-console-foreground text-console-ink":"bg-console-foreground/10")}>{c}</Button>)}</nav><div className="my-4 flex items-center justify-between text-sm text-console-foreground/60"><span>{games.length} items</span><Button variant="console" size="console" onClick={()=>setSort(v=>!v)}><ArrowDownUp/>{sort?"Name (A–Z)":"Recently added"}</Button></div><div className="min-h-0 flex-1 overflow-y-auto pb-16"><div className="grid gap-4 p-1" style={{gridTemplateColumns:`repeat(${cols},minmax(0,1fr))`}}>{games.map((g,n)=><Button key={g.id} ref={el=>{refs.current[n]=el;}} variant="console" size="console" aria-label={g.title} onFocus={()=>setI(n)} onClick={()=>setDetails(g)} className={cn("console-cover relative aspect-[4/5] overflow-hidden rounded-lg",idx===n&&"ring-2 ring-console-foreground")}><GameArt game={g}/><span className="absolute bottom-3 left-3 text-xs text-console-foreground/70">{statusOf(g,lib)}</span></Button>)}</div>{!games.length&&<div className="py-16 text-center"><p className="text-console-foreground/60">Your collection starts here.</p><Button variant="console" size="console" onClick={()=>go("/console/store")} className="mt-6 rounded-full bg-console-foreground/15 px-7 py-3">Browse games</Button></div>}</div></div></div>{details&&<GameDetails game={details} lib={lib} close={()=>setDetails(null)}/>}</ConsoleShell>;
 }

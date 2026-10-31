@@ -69,10 +69,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const f = prefs.focus;
-    if (!f || f === "all") return;
+    if (prefs.console !== "off" || !f || f === "all") return;
     const sec = /^\/(chat|voice|memory)/.test(path) ? "ai" : /^\/web/.test(path) ? "web" : /^\/movies/.test(path) ? "movies" : /^\/music/.test(path) ? "music" : /^\/games/.test(path) ? "games" : /^\/home/.test(path) ? "home" : null;
     if (sec && sec !== f) navigate({ to: ({ ai: "/chat", web: "/web", movies: "/movies", music: "/music", games: "/games" } as const)[f], replace: true });
-  }, [prefs.focus, path, navigate]);
+  }, [prefs.focus, prefs.console, path, navigate]);
 
   return (
     <ShellCtx.Provider value={{ openMenu: () => setMobileOpen(true), openCommand: () => setCmdOpen(true) }}>
@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <NowPlayingBar />
         </main>
       </div>
-      {prefs.device === "" ? <DevicePrompt /> : prefs.focus === "" && <FocusPrompt />}
+      {prefs.console === "off" && (prefs.device === "" ? <DevicePrompt /> : prefs.focus === "" && <FocusPrompt />)}
       <CommandMenu open={cmdOpen} onOpenChange={setCmdOpen} />
     </ShellCtx.Provider>
   );

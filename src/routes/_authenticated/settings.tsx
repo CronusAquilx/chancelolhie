@@ -105,15 +105,14 @@ function SettingsPage() {
             </Card>
             <Card title="Console mode">
               <Choice
-                value={p.console === "off" ? "sony" : p.console}
+                value={p.console}
                 onChange={(c) => set({ console: c })}
                 options={[
+                  { v: "off", label: "Off", sub: "Keep your existing app layout" },
                   { v: "sony", label: "Sony Console", sub: "Dark home row, big-tile store" },
-                  { v: "series", label: "Xbox Series", sub: "Hero home, guide sidebar, mosaic store" },
-                  { v: "classic", label: "Xbox Classic", sub: "Resume tile, discover row, pins guide" },
                 ]}
               />
-              <Row title="Open Console Mode" desc="Controller, keyboard (arrows, Enter, Esc, Q/E, G) and touch all work."><Button size="sm" onClick={() => navigate({ to: "/console" })}>Launch</Button></Row>
+              <Row title="Open Console Mode"><Button size="sm" onClick={() => { set({ console: "sony", focus: "all" }); navigate({ to: "/console" }); }}>Launch</Button></Row>
             </Card>
             <Card title="Home screen">
               <Row title="Title"><Input className="w-44" value={p.homeName} onChange={(e) => set({ homeName: e.target.value })} /></Row>

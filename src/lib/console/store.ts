@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
-import type { ConsoleGame } from "./catalog";
+import { launchPath, type ConsoleGame } from "./catalog";
 
 export type Lib = { installed: string[]; wishlist: string[]; lastPlayed: string | null; progress: Record<string, number> };
 
@@ -33,7 +33,9 @@ export function installGame(id: string) {
   if (state.installed.includes(id) || id in state.progress) return;
   state = { ...state, progress: { ...state.progress, [id]: 0 } };
   emit();
+  const owner = userKey;
   const timer = window.setInterval(() => {
+    if (owner !== userKey) { window.clearInterval(timer); return; }
     const next = (state.progress[id] ?? 0) + 4 + Math.random() * 8;
     if (next >= 100) {
       window.clearInterval(timer);
@@ -60,12 +62,14 @@ export function toggleWishlist(id: string) {
 export function playGame(g: ConsoleGame) {
   state = { ...state, lastPlayed: g.id };
   persist(); emit();
-  if (g.url) window.open(g.url, "_blank", "noopener");
+  const path = launchPath(g);
+  if (g.kind === "cloud") window.open(path, "_blank", "noopener");
+  else window.location.assign(path);
 }
 
 /** Install if missing, otherwise play. */
 export function actOn(g: ConsoleGame, lib: Lib) {
-  if (lib.installed.includes(g.id)) playGame(g);
+  if (g.kind === "app" || lib.installed.includes(g.id)) playGame(g);
   else installGame(g.id);
 }
 

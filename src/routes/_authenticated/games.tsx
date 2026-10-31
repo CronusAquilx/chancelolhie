@@ -1,4 +1,4 @@
-import { AAA_GAMES } from "@/lib/games/aaa";
+import { CLOUD_GAMES as CLOUD } from "@/lib/games/cloud-catalog";
 import { useGameplayPerformance } from "@/lib/games/performance";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -34,34 +34,6 @@ const SERVERS = [
   { name: "UGS", url: "https://0288007.github.io/ugs/" },
 ] as const;
 
-/** Cloud gaming services: big games (GTA V, Call of Duty, Fortnite) stream from their servers. */
-const CLOUD = [
-  ...AAA_GAMES,
-  { name: "Xbox Cloud (GTA V, COD)", url: "https://www.xbox.com/play" },
-  { name: "GeForce NOW", url: "https://play.geforcenow.com/" },
-  { name: "now.gg", url: "https://now.gg/" },
-  { name: "EasyFun", url: "https://www.easyfun.gg/" },
-  { name: "Boosteroid", url: "https://cloud.boosteroid.com/" },
-  { name: "Amazon Luna", url: "https://luna.amazon.com/" },
-  { name: "Krunker", url: "https://krunker.io/" },
-  { name: "Shell Shockers", url: "https://shellshock.io/" },
-  { name: "Venge.io", url: "https://venge.io/" },
-  { name: "Smash Karts", url: "https://smashkarts.io/" },
-  { name: "Bloxd.io", url: "https://bloxd.io/" },
-  { name: "Minecraft Classic", url: "https://classic.minecraft.net/" },
-  { name: "Eaglercraft", url: "https://eaglercraft.com/" },
-  { name: "Slither.io", url: "https://slither.io/" },
-  { name: "Agar.io", url: "https://agar.io/" },
-  { name: "Diep.io", url: "https://diep.io/" },
-  { name: "Zombs Royale", url: "https://zombsroyale.io/" },
-  { name: "Ev.io", url: "https://ev.io/" },
-  { name: "Kirka.io", url: "https://kirka.io/" },
-  { name: "1v1.LOL", url: "https://1v1.lol/" },
-  { name: "Doom (js-dos)", url: "https://dos.zone/doom-dec-1993/" },
-  { name: "Quake (WebQuake)", url: "https://www.netquake.io/" },
-  { name: "Polytrack", url: "https://www.kodub.com/apps/polytrack" },
-  { name: "Drift Hunters", url: "https://drift-hunters.co/" },
-] as const;
 
 type Mode = "games" | "sites" | "cloud";
 type Game = { id: number; name: string; author: string; file: string; cover: string };
@@ -232,7 +204,7 @@ function Profile({ games, onPlay }: { games: Game[]; onPlay: (g: Game) => void }
   );
 }
 
-function Player({ game, onBack }: { game: Game; onBack: () => void }) {
+export function Player({ game, onBack }: { game: Game; onBack: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const [nonce, setNonce] = useState(0);

@@ -1,84 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LayoutGrid, MoreHorizontal, Search, Settings, ShoppingBag } from "lucide-react";
+import { LayoutGrid, MoreHorizontal, Search, Settings, ShoppingBag, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { artStyle, gameById, type ConsoleGame } from "@/lib/console/catalog";
+import { APPS, gameById, type ConsoleGame } from "@/lib/console/catalog";
 import { playGame } from "@/lib/console/store";
 import { useConsoleInput } from "@/lib/console/nav";
 import { useConsoleCtx } from "@/lib/console/ctx";
 import { ConsoleShell } from "../ConsoleShell";
+import { GameArt, GameDetails, Avatar } from "../shared";
 import { cn } from "@/lib/utils";
-
-type Item = { kind: "store" } | { kind: "library" } | { kind: "game"; game: ConsoleGame };
-
-export function SonyHome() {
-  const { go, lib, p, clock, initial } = useConsoleCtx();
-  const refs = useRef<(HTMLDivElement | null)[]>([]);
-  const items = useMemo<Item[]>(() => {
-    const list: Item[] = [{ kind: "store" }];
-    for (const id of lib.installed) { const g = gameById(id); if (g) list.push({ kind: "game", game: g }); }
-    list.push({ kind: "library" });
-    return list;
-  }, [lib.installed]);
-  const [i, setI] = useState(1);
-  const idx = Math.min(i, items.length - 1);
-  const cur = items[idx];
-  const hero = cur.kind === "game" ? cur.game : null;
-  const activate = (n: number) => {
-    const it = items[n];
-    if (!it) return;
-    if (it.kind === "store") go("/console/store");
-    else if (it.kind === "library") go("/console/library");
-    else playGame(it.game);
-  };
-  useEffect(() => { refs.current[idx]?.scrollIntoView({ inline: "nearest", block: "nearest", behavior: p.reduceMotion ? "auto" : "smooth" }); }, [idx, p.reduceMotion]);
-  useConsoleInput((a) => {
-    if (a === "left") setI(Math.max(0, idx - 1));
-    else if (a === "right") setI(Math.min(items.length - 1, idx + 1));
-    else if (a === "select") activate(idx);
-    else if (a === "options") go("/console/settings");
-    else if (a === "back" || a === "menu") go("/home");
-  });
-  const label = cur.kind === "store" ? "Console Store" : cur.kind === "library" ? "Game Library" : cur.game.title;
-  return (
-    <ConsoleShell hue={hero?.hue ?? 235}>
-      <header className="flex items-start justify-between px-6 pt-6 md:px-12 md:pt-8">
-        <nav className="flex gap-8 text-xl md:text-2xl">
-          <span className="font-medium">Games</span>
-          <Button variant="console" size="console" onClick={() => go("/movies")} className="text-console-foreground/45">Media</Button>
-        </nav>
-        <div className="flex items-start gap-4 md:gap-6">
-          <Button variant="console" size="console" onClick={() => go("/console/store")} className="flex flex-col items-center gap-1 text-xs text-console-foreground/80">
-            <span className="flex size-10 items-center justify-center rounded-full bg-console-foreground/15"><Search className="size-5" /></span>
-            <span className="hidden md:block">Search</span>
-          </Button>
-          <Button variant="console" size="console" title="Settings" onClick={() => go("/console/settings")} className="flex size-10 items-center justify-center"><Settings className="size-6" /></Button>
-          <Button variant="console" size="console" title="Profile" onClick={() => go("/console/profile")} className="relative flex size-10 items-center justify-center rounded-full bg-console-foreground/20 text-sm font-semibold">
-            {initial}<span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-console-background bg-console-online" />
-          </Button>
-          <span className="pt-1.5 text-xl md:text-2xl">{clock}</span>
-        </div>
-      </header>
-      <div className="mt-6 flex items-end gap-3 overflow-x-auto px-6 pb-2 md:px-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((it, n) => {
-          const focused = n === idx;
-          return (
-            <div key={it.kind === "game" ? it.game.id : it.kind} ref={(el) => { refs.current[n] = el; }} className="flex shrink-0 items-end gap-3">
-              <Button variant="console" size="console" onClick={() => (focused ? activate(n) : setI(n))} className={cn("flex items-center justify-center overflow-hidden rounded-2xl bg-console-foreground/10 transition-all", p.reduceMotion ? "" : "duration-200", focused ? "size-24 ring-2 ring-console-foreground/90 md:size-32" : "size-14 opacity-80 md:size-16")} style={it.kind === "game" ? artStyle(it.game.hue) : undefined}>
-                {it.kind === "store" ? <ShoppingBag className={focused ? "size-10" : "size-6"} /> : it.kind === "library" ? <LayoutGrid className={focused ? "size-10" : "size-6"} /> : <span className={cn("px-1 text-center font-bold leading-tight", focused ? "text-sm" : "text-[10px]")}>{focused ? it.game.title : it.game.title.split(" ").map((w) => w[0]).join("")}</span>}
-              </Button>
-              {focused && <span className="pb-1 text-base md:text-xl">{label}</span>}
-            </div>
-          );
-        })}
-      </div>
-      <div className="absolute bottom-10 left-6 max-w-xl md:bottom-16 md:left-12">
-        <h1 className="text-4xl font-bold md:text-6xl">{hero ? hero.title : label}</h1>
-        <p className="mt-2 text-base text-console-foreground/80 md:text-lg">{hero ? hero.tagline : cur.kind === "library" ? "Everything you own, wishlisted or installed." : lib.installed.length ? "Browse and install new games." : "Nothing installed yet. Open the store to get your first game."}</p>
-        <div className="mt-6 flex items-center gap-3">
-          <Button variant="console" size="console" onClick={() => activate(idx)} className="rounded-full bg-console-foreground/15 px-12 py-3 text-lg font-medium backdrop-blur hover:bg-console-foreground/25 md:px-20">{hero ? "Play" : "Open"}</Button>
-          <Button variant="console" size="console" title="Options" onClick={() => go("/console/settings")} className="flex size-12 items-center justify-center rounded-full bg-console-foreground/15 backdrop-blur hover:bg-console-foreground/25"><MoreHorizontal className="size-6" /></Button>
-        </div>
-      </div>
-    </ConsoleShell>
-  );
+type Item = { kind: "store" | "library" | "apps"; title: string } | { kind: "game"; title: string; game: ConsoleGame };
+export function SonyHome({ media = false }: { media?: boolean }) {
+  const { go, lib, p, clock, initial, catalog } = useConsoleCtx();
+  const [i,setI]=useState(0); const [details,setDetails]=useState<ConsoleGame|null>(null); const refs=useRef<(HTMLButtonElement|null)[]>([]);
+  const items=useMemo<Item[]>(()=>media ? [...APPS.slice(0,3).map(game=>({kind:"game" as const,title:game.title,game})),{kind:"apps",title:"App Library"}] : [{kind:"store",title:"Game Store"},...lib.installed.map(id=>gameById(id,catalog.games)).filter((g):g is ConsoleGame=>!!g && g.kind!=="app").map(game=>({kind:"game" as const,title:game.title,game})),{kind:"library",title:"Game Library"}], [media,lib.installed,catalog.games]);
+  const idx=Math.min(i,items.length-1); const current=items[idx]; const hero=current?.kind==="game"?current.game:null;
+  const activate=(n:number)=>{const item=items[n];if(!item)return; if(item.kind==="game")playGame(item.game);else go(item.kind==="store"?"/console/store":item.kind==="apps"?"/console/apps":"/console/library");};
+  useEffect(()=>{refs.current[idx]?.focus({preventScroll:true});refs.current[idx]?.scrollIntoView({inline:"nearest",block:"nearest",behavior:p.reduceMotion?"auto":"smooth"});},[idx,p.reduceMotion]);
+  useConsoleInput(a=>{if(details){if(a==="back"||a==="options")setDetails(null);return;}if(a==="left")setI(Math.max(0,idx-1));else if(a==="right")setI(Math.min(items.length-1,idx+1));else if(a==="select")activate(idx);else if(a==="prev"||a==="next")go(media?"/console":"/console/media");else if(a==="options"){if(hero)setDetails(hero);else go("/console/settings");}else if(a==="back")go(media?"/console":"/home");else if(a==="menu")go("/console/apps");});
+  return <ConsoleShell hue={hero?.hue ?? (media?160:210)}><header className="console-topbar flex items-center justify-between gap-4 px-6 py-6 md:px-12 md:py-8"><nav className="flex gap-7"><Button variant="console" size="console" onClick={()=>go("/console")} className={cn("text-xl md:text-2xl",media?"text-console-foreground/45":"text-console-foreground")}>Games</Button><Button variant="console" size="console" onClick={()=>go("/console/media")} className={cn("text-xl md:text-2xl",media?"text-console-foreground":"text-console-foreground/45")}>Media</Button></nav><div className="flex items-center gap-3 md:gap-6"><Button variant="console" size="console" aria-label="Search games" title="Search games" onClick={()=>go("/console/store")} className="console-icon-button rounded-full bg-console-foreground/10"><Search/></Button><Button variant="console" size="console" aria-label="Settings" title="Settings" onClick={()=>go("/console/settings")} className="console-icon-button"><Settings/></Button><Button variant="console" size="console" aria-label="Profile" title="Profile" onClick={()=>go("/console/profile")} className="relative"><Avatar initial={initial} className="size-10"/><span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-console-background bg-console-online"/></Button>{p.showClock&&<span className="hidden text-xl sm:block">{clock}</span>}</div></header>
+    <div className="console-shelf flex items-center gap-4 overflow-x-auto px-6 py-5 md:px-12">{items.map((item,n)=><Button key={item.kind==="game"?item.game.id:item.kind} ref={el=>{refs.current[n]=el;}} variant="console" size="console" aria-label={item.title} aria-pressed={idx===n} onFocus={()=>setI(n)} onMouseEnter={()=>setI(n)} onClick={()=>activate(n)} className={cn("console-tile relative shrink-0 overflow-hidden rounded-lg bg-console-panel/75",idx===n?"is-selected":"")}>{item.kind==="game"?<GameArt game={item.game} title={false}/>:item.kind==="store"?<ShoppingBag className="size-8"/>:<LayoutGrid className="size-8"/>}</Button>)}</div>
+    <div className="px-6 md:px-12"><span className="text-sm text-console-foreground/75">{current?.title}</span></div>
+    <section key={current?.title} className="console-feature absolute bottom-[12%] left-6 right-6 max-w-2xl md:left-12"><span className="mb-4 block text-xs text-console-foreground/55">BIRCHBLOCK / {media?"MEDIA":"GAMES"}</span><h1 className="break-words text-4xl font-light leading-tight md:text-6xl">{current?.title}</h1><p className="mt-4 text-base text-console-foreground/70 md:text-lg">{hero?.tagline ?? (current?.kind==="store"?"Find your next game.":current?.kind==="apps"?"All your apps, together.":"Your collection. Always here.")}</p><div className="mt-7 flex gap-3"><Button variant="console" size="console" onClick={()=>activate(idx)} className="min-w-40 rounded-full bg-console-foreground/15 px-8 py-3 text-base hover:bg-console-foreground/25">{hero&&<Play className="size-4"/>}{hero?(media?"Open":"Play"):"Explore"}</Button><Button variant="console" size="console" aria-label="Options" title="Options" onClick={()=>hero?setDetails(hero):go("/console/settings")} className="size-12 rounded-full bg-console-foreground/15"><MoreHorizontal/></Button></div></section><footer className="absolute bottom-5 left-6 right-6 flex justify-between text-xs text-console-foreground/45 md:left-12 md:right-12"><span>{media?"Entertainment, on your terms.":`${lib.installed.length} installed · Your console`}</span><Button variant="console" size="console" onClick={()=>go("/console/apps")}>App Library <LayoutGrid className="size-3"/></Button></footer>{details&&<GameDetails game={details} lib={lib} close={()=>setDetails(null)}/>}</ConsoleShell>;
 }

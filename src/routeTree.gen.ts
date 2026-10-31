@@ -33,7 +33,10 @@ import { Route as ApiVoiceReplyRouteImport } from './routes/api/voice-reply'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
+import { Route as AuthenticatedConsoleAppsRouteImport } from './routes/_authenticated/console.apps'
+import { Route as AuthenticatedConsoleArcadeRouteImport } from './routes/_authenticated/console.arcade'
 import { Route as AuthenticatedConsoleLibraryRouteImport } from './routes/_authenticated/console.library'
+import { Route as AuthenticatedConsoleMediaRouteImport } from './routes/_authenticated/console.media'
 import { Route as AuthenticatedConsoleProfileRouteImport } from './routes/_authenticated/console.profile'
 import { Route as AuthenticatedConsoleSettingsRouteImport } from './routes/_authenticated/console.settings'
 import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
@@ -168,10 +171,28 @@ const AuthenticatedConsoleIndexRoute =
     path: '/console/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleAppsRoute =
+  AuthenticatedConsoleAppsRouteImport.update({
+    id: '/console/apps',
+    path: '/console/apps',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleArcadeRoute =
+  AuthenticatedConsoleArcadeRouteImport.update({
+    id: '/console/arcade',
+    path: '/console/arcade',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConsoleLibraryRoute =
   AuthenticatedConsoleLibraryRouteImport.update({
     id: '/console/library',
     path: '/console/library',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleMediaRoute =
+  AuthenticatedConsoleMediaRouteImport.update({
+    id: '/console/media',
+    path: '/console/media',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConsoleProfileRoute =
@@ -266,7 +287,10 @@ export interface FileRoutesByFullPath {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/console/apps': typeof AuthenticatedConsoleAppsRoute
+  '/console/arcade': typeof AuthenticatedConsoleArcadeRoute
   '/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/console/media': typeof AuthenticatedConsoleMediaRoute
   '/console/profile': typeof AuthenticatedConsoleProfileRoute
   '/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/console/store': typeof AuthenticatedConsoleStoreRoute
@@ -304,7 +328,10 @@ export interface FileRoutesByTo {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/console/apps': typeof AuthenticatedConsoleAppsRoute
+  '/console/arcade': typeof AuthenticatedConsoleArcadeRoute
   '/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/console/media': typeof AuthenticatedConsoleMediaRoute
   '/console/profile': typeof AuthenticatedConsoleProfileRoute
   '/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/console/store': typeof AuthenticatedConsoleStoreRoute
@@ -344,7 +371,10 @@ export interface FileRoutesById {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/voice-reply': typeof ApiVoiceReplyRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/console/apps': typeof AuthenticatedConsoleAppsRoute
+  '/_authenticated/console/arcade': typeof AuthenticatedConsoleArcadeRoute
   '/_authenticated/console/library': typeof AuthenticatedConsoleLibraryRoute
+  '/_authenticated/console/media': typeof AuthenticatedConsoleMediaRoute
   '/_authenticated/console/profile': typeof AuthenticatedConsoleProfileRoute
   '/_authenticated/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/_authenticated/console/store': typeof AuthenticatedConsoleStoreRoute
@@ -384,7 +414,10 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/chat/$threadId'
+    | '/console/apps'
+    | '/console/arcade'
     | '/console/library'
+    | '/console/media'
     | '/console/profile'
     | '/console/settings'
     | '/console/store'
@@ -422,7 +455,10 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/chat/$threadId'
+    | '/console/apps'
+    | '/console/arcade'
     | '/console/library'
+    | '/console/media'
     | '/console/profile'
     | '/console/settings'
     | '/console/store'
@@ -461,7 +497,10 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/voice-reply'
     | '/_authenticated/chat/$threadId'
+    | '/_authenticated/console/apps'
+    | '/_authenticated/console/arcade'
     | '/_authenticated/console/library'
+    | '/_authenticated/console/media'
     | '/_authenticated/console/profile'
     | '/_authenticated/console/settings'
     | '/_authenticated/console/store'
@@ -666,11 +705,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/apps': {
+      id: '/_authenticated/console/apps'
+      path: '/console/apps'
+      fullPath: '/console/apps'
+      preLoaderRoute: typeof AuthenticatedConsoleAppsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/arcade': {
+      id: '/_authenticated/console/arcade'
+      path: '/console/arcade'
+      fullPath: '/console/arcade'
+      preLoaderRoute: typeof AuthenticatedConsoleArcadeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/console/library': {
       id: '/_authenticated/console/library'
       path: '/console/library'
       fullPath: '/console/library'
       preLoaderRoute: typeof AuthenticatedConsoleLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/media': {
+      id: '/_authenticated/console/media'
+      path: '/console/media'
+      fullPath: '/console/media'
+      preLoaderRoute: typeof AuthenticatedConsoleMediaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/console/profile': {
@@ -771,7 +831,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVoiceRoute: typeof AuthenticatedVoiceRoute
   AuthenticatedWebRoute: typeof AuthenticatedWebRoute
   AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedConsoleAppsRoute: typeof AuthenticatedConsoleAppsRoute
+  AuthenticatedConsoleArcadeRoute: typeof AuthenticatedConsoleArcadeRoute
   AuthenticatedConsoleLibraryRoute: typeof AuthenticatedConsoleLibraryRoute
+  AuthenticatedConsoleMediaRoute: typeof AuthenticatedConsoleMediaRoute
   AuthenticatedConsoleProfileRoute: typeof AuthenticatedConsoleProfileRoute
   AuthenticatedConsoleSettingsRoute: typeof AuthenticatedConsoleSettingsRoute
   AuthenticatedConsoleStoreRoute: typeof AuthenticatedConsoleStoreRoute
@@ -796,7 +859,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVoiceRoute: AuthenticatedVoiceRoute,
   AuthenticatedWebRoute: AuthenticatedWebRoute,
   AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedConsoleAppsRoute: AuthenticatedConsoleAppsRoute,
+  AuthenticatedConsoleArcadeRoute: AuthenticatedConsoleArcadeRoute,
   AuthenticatedConsoleLibraryRoute: AuthenticatedConsoleLibraryRoute,
+  AuthenticatedConsoleMediaRoute: AuthenticatedConsoleMediaRoute,
   AuthenticatedConsoleProfileRoute: AuthenticatedConsoleProfileRoute,
   AuthenticatedConsoleSettingsRoute: AuthenticatedConsoleSettingsRoute,
   AuthenticatedConsoleStoreRoute: AuthenticatedConsoleStoreRoute,

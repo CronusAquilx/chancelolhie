@@ -1,5 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { usePrefs } from "@/lib/astra/prefs";
 import { AstraMark } from "@/components/astra/Mark";
 
 export const Route = createFileRoute("/")({
@@ -18,11 +19,12 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { session, loading } = useAuth();
+  const p = usePrefs();
   if (loading)
     return (
       <div className="flex min-h-screen items-center justify-center sky">
         <AstraMark className="size-8" pulsing />
       </div>
     );
-  return <Navigate to={session ? "/chat" : "/auth"} replace />;
+  return <Navigate to={session ? (p.console !== "off" ? "/console" : "/chat") : "/auth"} replace />;
 }
