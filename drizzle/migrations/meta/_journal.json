@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793408832406,
+      "tag": "0000_astra_schema",
+      "breakpoints": true
+    }
+  ]
 }
