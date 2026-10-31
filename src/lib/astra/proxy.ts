@@ -3,22 +3,44 @@ import type { Prefs } from "./prefs";
 export const DEFAULT_WISP = "wss://wisp.mercurywork.shop/";
 export const WISP_FALLBACKS = [DEFAULT_WISP, "wss://anura.pro/", "wss://definitelyscience.com/wisp/"];
 
-function probe(url: string, ms = 5000): Promise<boolean> {
-  return new Promise((resolve) => {
-    let ws: WebSocket;
-    try { ws = new WebSocket(url); } catch { return resolve(false); }
-    const t = setTimeout(() => { try { ws.close(); } catch {} resolve(false); }, ms);
-    ws.onopen = () => { clearTimeout(t); ws.close(); resolve(true); };
-    ws.onerror = () => { clearTimeout(t); resolve(false); };
+/** Resolve as soon as a server opens; close every probe, including slow losing sockets. */
+export function firstReachableWisp(urls: readonly string[], ms = 5000): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const sockets: WebSocket[] = [];
+    let settled = false;
+    let failed = 0;
+    const close = () => sockets.forEach((ws) => {
+      ws.onopen = null; ws.onerror = null; ws.onclose = null;
+      try { ws.close(); } catch { /* socket already closed */ }
+    });
+    const finish = (url?: string) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer); close();
+      if (url) resolve(url); else reject(new Error("No Wisp server reachable from this network"));
+    };
+    const timer = setTimeout(() => finish(), ms);
+    if (!urls.length) { finish(); return; }
+    for (const url of urls) {
+      let counted = false;
+      const fail = () => { if (counted || settled) return; counted = true; if (++failed === urls.length) finish(); };
+      try {
+        const ws = new WebSocket(url);
+        sockets.push(ws);
+        ws.onopen = () => finish(url);
+        ws.onerror = fail;
+        ws.onclose = fail;
+      } catch { fail(); }
+    }
   });
 }
 
 async function pickWisp(custom: string): Promise<string> {
-  const list = custom ? [custom, ...WISP_FALLBACKS] : WISP_FALLBACKS;
-  const results = await Promise.all(list.map((u) => probe(u)));
-  const i = results.findIndex(Boolean);
-  if (i < 0) throw new Error("No Wisp server reachable from this network");
-  return list[i]!;
+  // Honor a user's explicit server before racing the automatic fallbacks.
+  if (custom) {
+    try { return await firstReachableWisp([custom]); } catch { /* automatic fallback */ }
+  }
+  return firstReachableWisp(WISP_FALLBACKS.filter((url) => url !== custom));
 }
 
 type Controller = import("@mercuryworkshop/scramjet-controller").Controller;

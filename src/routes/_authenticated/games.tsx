@@ -1,4 +1,5 @@
 import { AAA_GAMES } from "@/lib/games/aaa";
+import { useGameplayPerformance } from "@/lib/games/performance";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Gamepad2, Globe, Maximize, RotateCw, Search, Wand2 } from "lucide-react";
@@ -17,7 +18,7 @@ import { ExternalLink, Heart, Trophy } from "lucide-react";
 import { useGameStats, toggleFavorite, recordPlay, addSeconds, recordMod, recordParty, achievements, totals } from "@/lib/games/stats";
 
 export const Route = createFileRoute("/_authenticated/games")({
-  head: () => ({ meta: [{ title: "Games — BirchBlock" }] }),
+  head: () => ({ meta: [{ title: "Games — BirchBlock" }, { name: "description", content: "Play browser games and connect to cloud gaming services in BirchBlock." }, { property: "og:title", content: "Games — BirchBlock" }, { property: "og:description", content: "Browse and play BirchBlock's arcade and cloud game library." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Games,
 });
 
@@ -375,14 +376,12 @@ function tileHue(name: string) { let h = 0; for (const c of name) h = (h * 31 + 
 // Big browser ports (Skate 3, Madden, GTA V, Counter-Strike…) need "cross-origin
 // isolation" and their own site address to boot, which no in-page proxy frame can
 // provide. They open in their own tab by default; "inside Astra" stays as a fallback.
-const AAA_NAMES = new Set(AAA_GAMES.map((g) => g.name));
-
 function CloudGrid({ list, note }: { list: readonly { name: string; url: string }[]; note?: string }) {
   const [open, setOpen] = useState<string | null>(null);
   const [inline, setInline] = useState(false);
   const [q, setQ] = useState("");
   const game = open ? list.find((g) => g.name === open) : undefined;
-  if (open && game && AAA_NAMES.has(open) && !inline) {
+  if (open && game && !inline) {
     const h = tileHue(game.name);
     return (
       <div className="flex min-h-0 flex-1 flex-col">
@@ -394,7 +393,6 @@ function CloudGrid({ list, note }: { list: readonly { name: string; url: string 
             </div>
             <div className="space-y-3 p-5">
               <h2 className="text-lg font-semibold">{game.name}</h2>
-              <p className="text-sm text-muted-foreground">This is a full console/PC game running in the browser. It runs best in its own tab, so it opens in a new tab through the Astra proxy.</p>
               <a href={`/play?url=${encodeURIComponent(game.url)}&name=${encodeURIComponent(game.name)}`} target="_blank" rel="noopener" className="block rounded-md bg-primary px-4 py-2.5 text-center font-medium text-primary-foreground hover:opacity-90">Play in new tab</a>
               <button onClick={() => setInline(true)} className="w-full rounded-md border px-4 py-2 text-sm text-muted-foreground hover:text-foreground">Try inside Astra anyway (may not load)</button>
             </div>
@@ -435,6 +433,7 @@ function CloudGrid({ list, note }: { list: readonly { name: string; url: string 
 
 function Sites({ list, storeKey, note, initial }: { list: readonly { name: string; url: string }[]; storeKey: string; note?: string; initial?: string }) {
   const prefs = usePrefs();
+  useGameplayPerformance();
   const ref = useRef<HTMLIFrameElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [server, setServer] = useState<string>(initial ?? list[0]!.name);
@@ -463,9 +462,9 @@ function Sites({ list, storeKey, note, initial }: { list: readonly { name: strin
     };
     iframe.addEventListener("load", keepInside);
     const spoofTimer = setInterval(() => spoofChrome(iframe.contentWindow), 300);
-    setTimeout(() => clearInterval(spoofTimer), 15000);
+    const spoofStop = setTimeout(() => clearInterval(spoofTimer), 15000);
     openProxied(iframe, current.url, prefs).catch((e) => setError(e instanceof Error ? e.message : String(e)));
-    return () => { clearInterval(spoofTimer); iframe.removeEventListener("load", keepInside); };
+    return () => { clearInterval(spoofTimer); clearTimeout(spoofStop); iframe.removeEventListener("load", keepInside); iframe.src = "about:blank"; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current.name, nonce, prefs.transport, prefs.wisp]);
 
