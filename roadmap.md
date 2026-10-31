@@ -1,6 +1,9 @@
 # Birchbeat import roadmap
 
 ## Console Mode
+- [x] Fix the diagnosed proxy startup failure by stripping browser transports from server execution; compilation and regression tests pass.
+- [ ] Verify the fix on the published runtime — waiting for Publish changes; the published site still runs the previous snapshot.
+- [x] Ask layout, device and content every new visit; always show matching login/account confirmation. Signed-out and restored-session flows verified.
 - [x] Finish Sony media, actual games/apps store and library, first-launch layout choice, profile/background settings and verification.
 - [x] Shared navigation, per-user library, Sony home/store/library/settings/profile.
 - [ ] Xbox Series and Xbox Classic screens and guides.

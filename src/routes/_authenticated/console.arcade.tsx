@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { consoleCatalogOptions } from "@/lib/console/catalog";
-import { Player } from "./games";
+import { Player } from "@/components/games/ArcadePlayer";
 import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/console/arcade")({
  validateSearch: (s: Record<string,unknown>) => ({game: typeof s["game"] === "string" ? s["game"] : ""}),

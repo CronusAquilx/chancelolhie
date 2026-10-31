@@ -21,7 +21,6 @@ function AuthedLayout() {
       </div>
     );
   if (!session) return <Navigate to="/auth" replace />;
-  if (pathname !== "/play" && (!prefs.device || !prefs.consoleSetup)) return <ConsoleOnboarding />;
   // The full-tab game player shows only the game (no sidebar or welcome prompts).
   if (pathname === "/play" || pathname.startsWith("/console")) return <Outlet />;
   return (

@@ -1,4 +1,5 @@
 import type { Prefs } from "./prefs";
+import { createClientOnlyFn } from "@tanstack/react-start";
 
 export const DEFAULT_WISP = "wss://wisp.mercurywork.shop/";
 export const WISP_FALLBACKS = [DEFAULT_WISP, "wss://anura.pro/", "wss://definitelyscience.com/wisp/"];
@@ -80,7 +81,7 @@ function waitForActive(reg: ServiceWorkerRegistration): Promise<ServiceWorker> {
   });
 }
 
-async function makeTransport(transport: Prefs["transport"], custom: string): Promise<any> {
+const makeTransport = createClientOnlyFn(async (transport: Prefs["transport"], custom: string): Promise<any> => {
   if (transport !== "astra") {
     const wisp = await pickWisp(custom).catch(() => null);
     if (wisp) {
@@ -97,7 +98,7 @@ async function makeTransport(transport: Prefs["transport"], custom: string): Pro
   const t = new AstraRelayTransport();
   await t.init();
   return t;
-}
+});
 
 async function buildController(transport: Prefs["transport"], custom: string): Promise<Controller> {
   await loadProxyScripts();

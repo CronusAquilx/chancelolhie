@@ -13,6 +13,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { VisitProvider } from "@/lib/console/visit";
+import { VisitGate } from "@/components/console/VisitGate";
 import { AuthProvider } from "@/lib/auth";
 
 function NotFoundComponent() {
@@ -110,7 +112,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <VisitProvider>
+          <VisitGate><Outlet /></VisitGate>
+        </VisitProvider>
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>

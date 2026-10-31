@@ -1,23 +1,14 @@
 import { useState } from "react";
-import { Monitor, Smartphone, Tablet, Gamepad2, LayoutGrid, ArrowLeft } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { Monitor, Smartphone, Tablet, Gamepad2, LayoutGrid, ArrowLeft, Music, Film, Bot, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePrefs, setPrefs, type Prefs } from "@/lib/astra/prefs";
 import { ConsoleShell } from "./ConsoleShell";
 import { useConsoleInput } from "@/lib/console/nav";
+import { useVisit } from "@/lib/console/visit";
 export function ConsoleOnboarding() {
-  const p = usePrefs(); const navigate = useNavigate(); const [selected, setSelected] = useState(0);
-  const deviceStep = !p.device;
-  const choices = deviceStep ? [
-    { label: "Laptop / desktop", icon: Monitor, value: "desktop" }, { label: "Phone", icon: Smartphone, value: "phone" }, { label: "Tablet", icon: Tablet, value: "tablet" },
-  ] : [
-    { label: "Sony Console", icon: Gamepad2, value: "sony" }, { label: "Classic", icon: LayoutGrid, value: "classic" }, { label: "Launcher", icon: Monitor, value: "launcher" },
-  ];
-  const choose = (n: number) => {
-    const c = choices[n]; if (!c) return;
-    if (deviceStep) { setPrefs({ device: c.value as Prefs["device"] }); setSelected(0); }
-    else { const sony = c.value === "sony"; setPrefs({ console: sony ? "sony" : "off", layout: c.value === "launcher" ? "launcher" : "classic", consoleSetup: true, ...(sony ? { focus: "all" as const } : {}) }); void navigate({ to: sony ? "/console" : "/home", replace: true }); }
-  };
-  useConsoleInput(a => { if (a === "left") setSelected(Math.max(0, selected - 1)); if (a === "right") setSelected(Math.min(2, selected + 1)); if (a === "select") choose(selected); });
-  return <ConsoleShell><div className="console-boot mx-auto flex min-h-dvh max-w-4xl flex-col justify-center px-6 py-12"><span className="mb-8 text-sm text-console-foreground/60">BIRCHBLOCK / WELCOME</span><h1 className="text-4xl font-light md:text-5xl">{deviceStep ? "What are you playing on?" : "Make yourself at home."}</h1><p className="mt-4 text-console-foreground/65">{deviceStep ? "Choose your device." : "Choose your layout."}</p><div className="mt-10 grid gap-4 sm:grid-cols-3">{choices.map((c,n)=><Button key={c.value} variant="console" size="console" onClick={()=>choose(n)} onFocus={()=>setSelected(n)} className={`flex min-h-44 flex-col items-start justify-between rounded-lg border border-console-foreground/20 bg-console-panel/60 p-6 text-left ${n===selected ? "ring-2 ring-console-foreground" : ""}`}><c.icon className="size-9"/><span className="text-lg">{c.label}</span></Button>)}</div><div className="mt-8 flex justify-between text-sm text-console-foreground/50"><span>{deviceStep ? "01" : "02"} / 02</span>{!deviceStep && <Button variant="console" size="console" onClick={()=>setPrefs({device:""})}><ArrowLeft/>Device</Button>}</div></div></ConsoleShell>;
+ const p=usePrefs();const {send}=useVisit();const [step,setStep]=useState(0);const [selected,setSelected]=useState(0);
+ const choices=step===0 ? [{label:"Sony Console",icon:Gamepad2,value:"sony"},{label:"Regular / Classic",icon:LayoutGrid,value:"classic"},{label:"Regular / Launcher",icon:Monitor,value:"launcher"}] : step===1 ? [{label:"Laptop / desktop",icon:Monitor,value:"desktop"},{label:"Phone",icon:Smartphone,value:"phone"},{label:"Tablet",icon:Tablet,value:"tablet"}] : [{label:"Everything",icon:LayoutGrid,value:"all"},{label:"Games",icon:Gamepad2,value:"games"},{label:"Music",icon:Music,value:"music"},{label:"Movies",icon:Film,value:"movies"},{label:"AI",icon:Bot,value:"ai"},{label:"Web",icon:Globe,value:"web"}];
+ const choose=(n:number)=>{const c=choices[n];if(!c)return;if(step===0)setPrefs({console:c.value==="sony"?"sony":"off",layout:c.value==="launcher"?"launcher":"classic"});else if(step===1)setPrefs({device:c.value as Prefs["device"]});else{setPrefs({focus:c.value as Prefs["focus"],consoleSetup:true});send("choices-complete");return;}setStep(step+1);setSelected(0);};
+ useConsoleInput(a=>{if(a==="left")setSelected(Math.max(0,selected-1));if(a==="right")setSelected(Math.min(choices.length-1,selected+1));if(a==="select")choose(selected);if(a==="back"&&step>0){setStep(step-1);setSelected(0);}});
+ return <ConsoleShell><div className="console-boot mx-auto flex h-dvh max-w-4xl flex-col justify-center overflow-y-auto px-6 py-10"><span className="mb-6 text-sm text-console-foreground/60">BIRCHBLOCK / WELCOME</span><h1 className="text-3xl font-light md:text-5xl">{step===0?"Choose your layout.":step===1?"What are you playing on?":"What do you want to show?"}</h1><p className="mt-4 text-console-foreground/65">{step===0?"Console or regular. Your choice.":step===1?"Choose your device.":"Make room for what you love."}</p><div className="mt-8 grid gap-4 sm:grid-cols-3">{choices.map((c,n)=><Button key={c.value} variant="console" size="console" onClick={()=>choose(n)} onFocus={()=>setSelected(n)} className={`flex min-h-28 flex-col items-start justify-between gap-5 rounded-lg border border-console-foreground/20 bg-console-panel/60 p-5 text-left md:min-h-36 ${n===selected?"ring-2 ring-console-foreground":""}`}><c.icon className="size-8"/><span className="text-base md:text-lg">{c.label}</span></Button>)}</div><div className="mt-8 flex justify-between text-sm text-console-foreground/50"><span>0{step+1} / 03</span>{step>0&&<Button variant="console" size="console" onClick={()=>{setStep(step-1);setSelected(0);}}><ArrowLeft/>Back</Button>}<span>{step>0&&p.console==="sony"?"Sony Console":""}</span></div></div></ConsoleShell>;
 }

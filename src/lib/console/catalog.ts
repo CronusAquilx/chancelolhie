@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getConsoleArcade } from "./catalog.functions";
 import { CLOUD_GAMES } from "@/lib/games/cloud-catalog";
 
 export type ConsoleGame = {
@@ -22,9 +23,7 @@ export function fromArcade(g: ArcadeGame): ConsoleGame { return { id: `arcade:${
 export const consoleCatalogOptions = queryOptions({
   queryKey: ["console-catalog"], staleTime: 60 * 60 * 1000,
   queryFn: async () => {
-    const response = await fetch("/api/public/games/list");
-    if (!response.ok) throw new Error("Arcade games couldn't load. Try again.");
-    const raw: unknown = await response.json();
+    const raw: unknown = await getConsoleArcade();
     if (!Array.isArray(raw)) throw new Error("Arcade games couldn't load. Try again.");
     const arcade = raw.filter((g): g is ArcadeGame => !!g && typeof g.id === "number" && typeof g.name === "string" && typeof g.file === "string" && /^[A-Za-z0-9._-]+\.html?$/.test(g.file));
     return { arcade, games: [...CATALOG, ...arcade.map(fromArcade), ...APPS] };

@@ -102,7 +102,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <NowPlayingBar />
         </main>
       </div>
-      {prefs.console === "off" && (prefs.device === "" ? <DevicePrompt /> : prefs.focus === "" && <FocusPrompt />)}
       <CommandMenu open={cmdOpen} onOpenChange={setCmdOpen} />
     </ShellCtx.Provider>
   );
