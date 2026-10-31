@@ -5,7 +5,7 @@ import { CLOUD_GAMES } from "../games/cloud-catalog";
 describe("Console real catalog", () => {
   it("includes every existing cloud game without changing its address", () => {
     expect(CATALOG.length).toBe(CLOUD_GAMES.length);
-    for (const game of CLOUD_GAMES) expect(CATALOG.find(g => g.url === game.url)?.title).toBe(game.name);
+    for (const game of CLOUD_GAMES) expect(CATALOG.find(g => g.url === game.url && g.title === game.name)?.title).toBe(game.name);
   });
   it("keeps Cloud launches in the standalone player", () => {
     const gta = CATALOG.find(g => g.url === "https://fiveplay.lol/");
