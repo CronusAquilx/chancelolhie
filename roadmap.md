@@ -1,6 +1,7 @@
 # Birchbeat import roadmap
 
 ## Console Mode
+- [ ] Finish Sony media, actual games/apps store and library, first-launch layout choice, profile/background settings and verification.
 - [ ] Shared navigation, per-user library, Sony home/store/library/settings/profile.
 - [ ] Xbox Series and Xbox Classic screens and guides.
 - [ ] Settings picker, Home entry, documentation and verification.
