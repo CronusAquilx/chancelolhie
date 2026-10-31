@@ -5,7 +5,7 @@ import { useEffect } from "react";
 // idle) lands here instead of the 404 page; send the user back to Games.
 export const Route = createFileRoute("/scramjet/p/$")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Reopening — BirchBlock" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Reopening \u2014 BirchBlock" }, { name: "description", content: "Return to the BirchBlock game library when a proxy session needs to reopen." }, { property: "og:title", content: "Reopening \u2014 BirchBlock" }, { property: "og:description", content: "Return to the BirchBlock game library when a proxy session needs to reopen." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: ProxyFallback,
 });
 

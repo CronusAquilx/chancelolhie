@@ -16,7 +16,7 @@ import { ACCENTS, PALETTES, resetPrefs, setPrefs, usePrefs, type Prefs } from "@
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — BirchBlock" }] }),
+  head: () => ({ meta: [{ title: "Settings \u2014 BirchBlock" }, { name: "description", content: "Manage your BirchBlock appearance, privacy, proxy and AI preferences." }, { property: "og:title", content: "Settings \u2014 BirchBlock" }, { property: "og:description", content: "Manage your BirchBlock appearance, privacy, proxy and AI preferences." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: SettingsPage,
 });
 
