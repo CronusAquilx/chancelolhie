@@ -41,7 +41,7 @@ async function relay(request: Request): Promise<Response> {
   let upstream: Response;
   try {
     const method = isBatch ? "POST" : request.method === "HEAD" ? "HEAD" : "GET";
-    upstream = await fetch(`${UPSTREAM}${path}${url.search}`, { method, headers: fwd, body: isBatch ? await request.arrayBuffer() : undefined, redirect: "follow" });
+    upstream = await fetch(`${UPSTREAM}${path}${url.search}`, { method, headers: fwd, body: isBatch ? await request.arrayBuffer() : null, redirect: "follow" });
   } catch {
     return new Response("Game server unreachable", { status: 502, headers: ISOLATION });
   }
